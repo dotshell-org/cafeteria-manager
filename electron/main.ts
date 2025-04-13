@@ -16,7 +16,6 @@ let win: BrowserWindow | null
 
 function createWindow() {
   win = new BrowserWindow({
-    // Add minimum size options
     minWidth: 900,
     minHeight: 650,
     webPreferences: {
