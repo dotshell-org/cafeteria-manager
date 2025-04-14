@@ -1,4 +1,4 @@
-import {useMemo, useState} from 'react';
+import {useMemo, useState, useEffect} from 'react';
 import { useMediaQuery, createTheme, ThemeProvider } from '@mui/material';
 import Calendar from "./pages/Calendar.tsx";
 import NavBar from "./components/nav/NavBar.tsx";
@@ -22,6 +22,15 @@ function App() {
                 },
             },
         }), [prefersDarkMode]);
+        
+    // Apply dark mode class to HTML
+    useEffect(() => {
+        if (prefersDarkMode) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    }, [prefersDarkMode]);
 
     const [selectedTab, setSelectedTab] = useState<Tab>(Tab.Calendar);
     const [selectedDateForCashRegister, setSelectedDateForCashRegister] = useState<string>(dayjs().format("YYYY-MM-DD"));
@@ -32,7 +41,7 @@ function App() {
         if (selectedTab !== tab) {
             setExitingTab(selectedTab);
             setDirection('exit');
-            setBGColor("#ffffff");
+            setBGColor(prefersDarkMode ? "#1a1a1a" : "#ffffff");
             
             // Delay the actual tab change to allow for exit animation
             setTimeout(() => {
@@ -52,9 +61,27 @@ function App() {
         setDirection('enter');
         setExitingTab(null);
 
+        // Adapter la couleur pour le mode sombre si nécessaire
+        const darkModeColor = prefersDarkMode ? adjustColorForDarkMode(color) : color;
+
         setTimeout(() => {
-            setBGColor(color);
+            setBGColor(darkModeColor);
         }, 200);
+    }
+
+    // Fonction helper pour ajuster les couleurs en mode sombre
+    const adjustColorForDarkMode = (color: string) => {
+        // Si la couleur est déjà adaptée pour le dark mode, on la renvoie telle quelle
+        if (color.includes('dark:')) return color;
+        
+        // Si c'est une couleur claire, on la fonce pour le mode sombre
+        if (color.includes('bg-blue-50')) return prefersDarkMode ? 'bg-blue-900' : color;
+        if (color.includes('bg-blue-100')) return prefersDarkMode ? 'bg-blue-800' : color;
+        if (color.includes('bg-blue-200')) return prefersDarkMode ? 'bg-blue-700' : color;
+        if (color.includes('bg-blue-300')) return prefersDarkMode ? 'bg-blue-600' : color;
+        if (color.includes('bg-gray-100') || color.includes('bg-gray-200')) return prefersDarkMode ? 'bg-gray-800' : color;
+        
+        return prefersDarkMode ? '#1a1a1a' : color; // Couleur par défaut pour le mode sombre
     }
 
     const renderTab = (tab: Tab) => {
@@ -68,7 +95,7 @@ function App() {
         }
     }
 
-    const [BGColor, setBGColor] = useState<string>("#ffffff");
+    const [BGColor, setBGColor] = useState<string>(prefersDarkMode ? "#1a1a1a" : "#ffffff");
 
     return (
         <ThemeProvider theme={theme}>

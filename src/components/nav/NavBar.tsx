@@ -23,10 +23,10 @@ const NavBar: React.FC<NavBarProps> = ({ selectedTab, onTabSelected }) => {
     }
 
     return (
-        <div className="z-10 w-14 h-full shadow-sm bg-gray-50 dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700">
-            <img src={Icon} alt="" className="p-1.5 mt-6 mb-4" />
+        <div className="z-50 w-14 h-full bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-600">
+            <img src={Icon} alt="" className="p-1.5 mt-6 mb-4 dark:invert" />
             {items.map((item) => (
-                <NavItem text={item.text} active={selectedTab == item.tab} onClick={() => handleTabSelected(item.tab)} />
+                <NavItem key={item.tab} text={item.text} active={selectedTab == item.tab} onClick={() => handleTabSelected(item.tab)} />
             ))}
         </div>
     )

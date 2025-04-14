@@ -61,6 +61,33 @@ const Calendar: React.FC<CalendarInterface> = ({ onClick }) => {
         }, 500);
     };
 
+    // Function to get the background color of a day with dark mode support
+    const getDayBackgroundColor = (day: dayjs.Dayjs) => {
+        if (day.day() === 0) { // Sunday
+            return 'bg-gray-100 text-gray-400 dark:bg-gray-600 dark:text-gray-500';
+        } else if (day.day() === 6) { // Saturday
+            return 'bg-gray-200 text-gray-400 dark:bg-gray-700 dark:text-gray-500';
+        } else {
+            const lightColors = [
+                'bg-blue-50 text-blue-300',
+                'bg-blue-100 text-blue-400',
+                'bg-blue-200 text-blue-400',
+                'bg-blue-300 text-blue-500',
+                'bg-blue-400 text-blue-600'
+            ];
+            
+            const darkColors = [
+                'dark:bg-blue-900 dark:text-blue-300',
+                'dark:bg-blue-800 dark:text-blue-400',
+                'dark:bg-blue-700 dark:text-blue-400',
+                'dark:bg-blue-600 dark:text-blue-300',
+                'dark:bg-blue-500 dark:text-blue-200'
+            ];
+            
+            return `${lightColors[day.day() - 1]} ${darkColors[day.day() - 1]}`;
+        }
+    };
+
     // Animation variants for the container
     const containerVariants = {
         visible: {
@@ -144,7 +171,7 @@ const Calendar: React.FC<CalendarInterface> = ({ onClick }) => {
             >
                 <motion.button
                     onClick={navigateToPreviousDays}
-                    className="p-2 rounded-lg bg-gray-100"
+                    className="p-2 rounded-lg bg-gray-100 dark:bg-gray-800 dark:text-gray-200"
                     variants={buttonVariants}
                 >
                     <svg
@@ -164,7 +191,7 @@ const Calendar: React.FC<CalendarInterface> = ({ onClick }) => {
 
                 <motion.button
                     onClick={goToToday}
-                    className="bg-gray-100"
+                    className="bg-gray-100 dark:bg-gray-800 dark:text-gray-200"
                     variants={buttonVariants}
                 >
                     Today
@@ -172,7 +199,7 @@ const Calendar: React.FC<CalendarInterface> = ({ onClick }) => {
 
                 <motion.button
                     onClick={navigateToNextDays}
-                    className="p-2 rounded-lg bg-gray-100"
+                    className="p-2 rounded-lg bg-gray-100 dark:bg-gray-800 dark:text-gray-200"
                     variants={buttonVariants}
                 >
                     <svg
@@ -207,8 +234,8 @@ const Calendar: React.FC<CalendarInterface> = ({ onClick }) => {
                                 key={index}
                                 className={
                                     day.isSame(dayjs(), 'day')
-                                        ? 'font-bold text-blue-600'
-                                        : ''
+                                        ? 'font-bold text-blue-600 dark:text-blue-400'
+                                        : 'dark:text-gray-300'
                                 }
                                 custom={animDirection}
                                 variants={itemVariants}
@@ -227,7 +254,7 @@ const Calendar: React.FC<CalendarInterface> = ({ onClick }) => {
                 <AnimatePresence mode="wait" custom={animDirection}>
                     <motion.div
                         key={currentDate.format('YYYY-MM-DD') + '-content'}
-                        className="grid grid-cols-7 text-center h-[calc(100%-5rem)]"
+                        className="grid grid-cols-7 text-center h-[calc(100%-5rem)] pt-1"
                         custom={animDirection}
                         variants={containerVariants}
                         initial="hidden"
@@ -235,18 +262,7 @@ const Calendar: React.FC<CalendarInterface> = ({ onClick }) => {
                         exit="exit"
                     >
                         {displayedDays.map((day, index) => {
-                            const bgColor =
-                                day.day() === 0 // Sunday
-                                    ? 'bg-gray-100 text-gray-400'
-                                    : day.day() === 6 // Saturday
-                                        ? 'bg-gray-200 text-gray-400'
-                                        : [
-                                            'bg-blue-50 text-blue-300',
-                                            'bg-blue-100 text-blue-400',
-                                            'bg-blue-200 text-blue-400',
-                                            'bg-blue-300 text-blue-500',
-                                            'bg-blue-400 text-blue-600',
-                                        ][day.day() - 1];
+                            const bgColor = getDayBackgroundColor(day);
 
                             return (
                                 <motion.div
@@ -257,10 +273,13 @@ const Calendar: React.FC<CalendarInterface> = ({ onClick }) => {
                                         index > 0 ? 'ml-1.5' : ''
                                     } ${
                                         index < 6 ? 'mr-1.5' : ''
-                                    } rounded-lg h-full ${bgColor} hover:mt-1 transition-all cursor-pointer`}
+                                    } rounded-lg h-full ${bgColor} hover:-mt-1 transition-all cursor-pointer shadow`}
                                     onClick={() => handleSlideUp(bgColor, day.format('YYYY-MM-DD'))}
                                 >
-                                    <h1 className="flex items-center justify-center h-full opacity-80">
+                                    <h1
+                                        className="flex items-center justify-center h-full opacity-80"
+                                        style={{fontSize: `calc(2rem + 0.8vw)`}}
+                                    >
                                         €0.0
                                     </h1>
                                 </motion.div>

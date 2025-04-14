@@ -1,6 +1,8 @@
 import {app, BrowserWindow, ipcMain} from 'electron';
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
+import '../src/backend/db/tables.ts'
+import {getGroups, getItemsForUI} from "../src/backend/db/getters.ts";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -55,6 +57,9 @@ function handleIpc(name: string, handler: (...args: any[]) => any) {
     }
   });
 }
+
+handleIpc('getItemsForUI', getItemsForUI);
+handleIpc('getGroups', getGroups);
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
