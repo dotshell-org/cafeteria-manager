@@ -1,3 +1,8 @@
 {
-
+  "today": "Today",
+  "searchForProducts": "Search for products...",
+  "order": "Order",
+  "total": "Total",
+  "validate": "Validate",
+  "quantity": "Quantity"
 }

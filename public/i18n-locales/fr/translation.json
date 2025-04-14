@@ -1,3 +1,8 @@
 {
-
+  "today": "Aujourd'hui",
+  "searchForProducts": "Rechercher des produits...",
+  "order": "Commande",
+  "total": "Total",
+  "validate": "Valider",
+  "quantity": "Quantité"
 }

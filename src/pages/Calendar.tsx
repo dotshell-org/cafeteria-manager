@@ -1,7 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import dayjs from 'dayjs';
 import 'dayjs/locale/fr'; // For displaying days in French
-import { motion, AnimatePresence } from 'framer-motion'; // Import framer-motion
+import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 
 // Format days: "Mon 12 April"
 const formatDate = (date: string | number | dayjs.Dayjs | Date | null | undefined) => {
@@ -20,6 +21,7 @@ interface CalendarInterface {
 }
 
 const Calendar: React.FC<CalendarInterface> = ({ onClick }) => {
+    const { t } = useTranslation();
     // State for the central date (default is today)
     const [currentDate, setCurrentDate] = useState(dayjs());
     // State for displayed dates
@@ -194,7 +196,7 @@ const Calendar: React.FC<CalendarInterface> = ({ onClick }) => {
                     className="bg-gray-100 dark:bg-gray-800 dark:text-gray-200"
                     variants={buttonVariants}
                 >
-                    Today
+                    {t("today")}
                 </motion.button>
 
                 <motion.button

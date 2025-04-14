@@ -6,6 +6,7 @@ import {Item} from "../types/generic/Item.ts";
 import {ItemGroup} from "../types/generic/ItemGroup.ts";
 import ProductCard from "../components/cash-register/ProductCard.tsx";
 import { IpcRenderer } from "electron";
+import {t} from "i18next";
 
 // Define the extended Window interface
 declare global {
@@ -79,7 +80,7 @@ const CashRegister: React.FC<CashRegisterProps> = ({date}) => {
                 variants={variants}
             >
                 <div className="flex-1 h-full p-4 pt-6 rounded-t-xl border border-b-0 border-gray-200 dark:border-gray-600">
-                    <SearchBar placeholder="Search for products..." onSearch={setSearchTerm} />
+                    <SearchBar placeholder={t("searchForProducts")} onSearch={setSearchTerm} />
                     <ItemGroupChoiceBar groups={groups} onGroupSelected={handleGroupSelected} />
                     <div
                         className="w-full max-h-[calc(100vh-200px)] pr-3 pb-6 pt-2 overflow-y-auto grid grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4 mt-4">
@@ -108,7 +109,7 @@ const CashRegister: React.FC<CashRegisterProps> = ({date}) => {
                 <div className="w-80 h-full p-4 rounded-t-xl ml-8 border border-b-0 border-gray-200 dark:border-gray-600">
                     <div className="flex flex-col h-[calc(100%-12rem)]">
                         <h1 className="text-2xl text-black" style={{display: 'none'}}>{date}</h1>
-                        <h1 className="text-2xl mt-4 text-black dark:text-white">Order</h1>
+                        <h1 className="text-2xl mt-4 text-black dark:text-white">{t("order")}</h1>
                         <div
                             className="flex-1 mt-3 py-2 rounded-xl shadow border dark:border-gray-600 overflow-y-auto"
                         >
@@ -142,7 +143,7 @@ const CashRegister: React.FC<CashRegisterProps> = ({date}) => {
                                             >
                                                 <div>
                                                     <h3 className="text-lg font-medium text-black dark:text-white">{item.name}</h3>
-                                                    <p className="text-sm text-gray-500 dark:text-gray-400">Quantity: {item.quantity}</p>
+                                                    <p className="text-sm text-gray-500 dark:text-gray-400">{t("quantity")}: {item.quantity}</p>
                                                 </div>
                                                 <span className="text-lg font-bold text-black dark:text-white">
                                                     €{(item.quantity * item.price).toFixed(2)}
@@ -156,10 +157,10 @@ const CashRegister: React.FC<CashRegisterProps> = ({date}) => {
                     </div>
                     <div
                         className="w-full h-10 mt-8 flex items-center justify-between">
-                        <span className="text-2xl mt-3 text-black dark:text-white">Total</span>
+                        <span className="text-2xl mt-3 text-black dark:text-white">{t("total")}</span>
                         <span className="text-2xl mt-4 font-bold text-black dark:text-white">€{itemsInCommand.reduce((acc, item) => acc + item.quantity * item.price, 0).toFixed(2)}</span>
                     </div>
-                    <button className="w-full mt-4 text-center text-lg bg-gray-100 dark:bg-gray-800">Validate</button>
+                    <button className="w-full mt-4 text-center text-lg bg-gray-100 dark:bg-gray-800">{t("validate")}</button>
                 </div>
             </motion.div>
         </div>
