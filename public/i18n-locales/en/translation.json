@@ -4,5 +4,15 @@
   "order": "Order",
   "total": "Total",
   "validate": "Validate",
-  "quantity": "Quantity"
+  "quantity": "Quantity",
+
+  "edit_products": "Edit Products",
+  "add_product": "Add Product",
+  "product": "Product",
+  "price": "Price",
+  "group": "Group",
+  "image": "Image",
+  "change_image": "Change Image",
+  "no_image": "No Image",
+  "saving": "Saving..."
 }

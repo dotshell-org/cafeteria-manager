@@ -4,5 +4,15 @@
   "order": "Commande",
   "total": "Total",
   "validate": "Valider",
-  "quantity": "Quantité"
+  "quantity": "Quantité",
+
+  "edit_products": "Editer les produits",
+  "add_product": "Ajouter un produit",
+  "product": "Produit",
+  "price": "Prix",
+  "group": "Groupe",
+  "image": "Image",
+  "change_image": "Changer l'image",
+  "no_image": "Pas d'image",
+  "saving": "Enregistrement..."
 }

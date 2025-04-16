@@ -1,6 +1,7 @@
-export interface Item {
+export interface Product {
+    id: number; // Add ID field
     name: string;
-    quantity: number;
     price: number;
+    group: string;
     image?: string; // Represents the file path (e.g., file://...)
 }

@@ -1,10 +1,23 @@
-import {app, BrowserWindow, ipcMain} from 'electron';
+import {app, BrowserWindow, ipcMain, protocol} from 'electron';
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
+import fs from 'node:fs'; // Import fs
+import crypto from 'node:crypto'; // Import crypto for unique filenames
 import '../src/backend/db/tables.ts'
-import {getGroups, getItemsForUI} from "../src/backend/db/getters.ts";
+import {getGroups, getItemsForUI, getProducts} from "../src/backend/db/getters.ts"; // Import getProducts
+import { addProduct, updateProduct, deleteProduct } from '../src/backend/db/setters.ts'; // Import setters
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
+
+// --- Image Storage Setup ---
+const USER_DATA_PATH = app.getPath('userData');
+const IMAGES_DIR = path.join(USER_DATA_PATH, 'product_images');
+
+// Ensure image directory exists
+if (!fs.existsSync(IMAGES_DIR)) {
+    fs.mkdirSync(IMAGES_DIR, { recursive: true });
+}
+// --- End Image Storage Setup ---
 
 process.env.APP_ROOT = path.join(__dirname, '..')
 
@@ -18,10 +31,11 @@ let win: BrowserWindow | null
 
 function createWindow() {
   win = new BrowserWindow({
-    minWidth: 900,
+    minWidth: 1000,
     minHeight: 650,
     webPreferences: {
       preload: path.join(__dirname, 'preload.mjs'),
+      webSecurity: false, // Permettre le chargement des ressources locales
     },
   })
 
@@ -47,6 +61,44 @@ function createWindow() {
   }
 }
 
+// --- IPC Handlers ---
+
+// Helper function to save image data
+async function saveImageData(base64Data: string, originalFileName: string): Promise<string> {
+    try {
+        const matches = base64Data.match(/^data:(.+);base64,(.+)$/);
+        if (!matches || matches.length !== 3) {
+            throw new Error('Invalid base64 data format');
+        }
+        const dataBuffer = Buffer.from(matches[2], 'base64');
+        const fileExtension = path.extname(originalFileName) || '.png'; // Default to png if no extension
+        const uniqueFilename = `${crypto.randomBytes(16).toString('hex')}${fileExtension}`;
+        const filePath = path.join(IMAGES_DIR, uniqueFilename);
+
+        await fs.promises.writeFile(filePath, dataBuffer);
+        // Return the file path using the file:// protocol for renderer access
+        return `file://${filePath}`;
+    } catch (error) {
+        console.error('Failed to save image:', error);
+        throw error; // Re-throw the error to be caught by handleIpc
+    }
+}
+
+// Helper function to delete an image file
+async function deleteImageFile(imagePath: string | null | undefined): Promise<void> {
+    if (!imagePath || !imagePath.startsWith('file://')) return; // Only delete files managed by the app
+
+    const filePath = fileURLToPath(imagePath);
+    try {
+        if (fs.existsSync(filePath)) {
+            await fs.promises.unlink(filePath);
+            console.log(`Deleted image: ${filePath}`);
+        }
+    } catch (error) {
+        console.error(`Failed to delete image ${filePath}:`, error);
+    }
+}
+
 function handleIpc(name: string, handler: (...args: any[]) => any) {
   ipcMain.handle(name, async (_event, ...args) => {
     try {
@@ -58,8 +110,41 @@ function handleIpc(name: string, handler: (...args: any[]) => any) {
   });
 }
 
+// --- Database Operation Handlers with Image Logic ---
+
 handleIpc('getItemsForUI', getItemsForUI);
 handleIpc('getGroups', getGroups);
+handleIpc('getProducts', getProducts);
+
+handleIpc('addProduct', async (product: Omit<Product, 'id'>) => {
+    return addProduct(product);
+});
+
+handleIpc('updateProduct', async (product: Product) => {
+    const oldProduct = getProducts().find(p => p.id === product.id);
+    const oldImagePath = oldProduct?.image;
+
+    updateProduct(product);
+
+    if (oldImagePath && oldImagePath !== product.image) {
+        await deleteImageFile(oldImagePath);
+    }
+});
+
+handleIpc('deleteProduct', async (productId: number) => {
+    const productToDelete = getProducts().find(p => p.id === productId);
+    const imagePathToDelete = productToDelete?.image;
+
+    deleteProduct(productId);
+
+    if (imagePathToDelete) {
+        await deleteImageFile(imagePathToDelete);
+    }
+});
+
+handleIpc('saveImage', async (base64Data: string, originalFileName: string) => {
+    return await saveImageData(base64Data, originalFileName);
+});
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
@@ -74,4 +159,13 @@ app.on('activate', () => {
   }
 });
 
-app.whenReady().then(createWindow);
+// Ajout de la configuration du protocole file pour permettre l'accès aux fichiers
+app.whenReady().then(() => {
+  // Permettre l'accès aux fichiers locaux (protocole file://)
+  protocol.registerFileProtocol('file', (request, callback) => {
+    const pathname = decodeURI(request.url.replace('file:///', ''));
+    callback(pathname);
+  });
+  
+  createWindow();
+});
