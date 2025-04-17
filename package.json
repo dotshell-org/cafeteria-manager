@@ -4,15 +4,18 @@
   "version": "0.0.0",
   "description": "A modern cafeteria manager software compatible with Glome.",
   "author": "Dotshell",
+  "email": "tristan.gscn@proton.me",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "rebuild": "electron-rebuild -f -w better-sqlite3",
     "postinstall": "electron-builder install-app-deps",
     "build:renderer": "vite build --mode production",
-    "build:electron": "electron-builder --config.asar=true",
+    "build:electron": "node -e \"const os=require('os'); const platform=os.platform(); const targets=[]; if(platform==='darwin') targets.push('--mac'); if(platform==='linux') targets.push('--linux'); if(platform==='win32') targets.push('--win'); require('child_process').execSync('electron-builder --config.asar=true ' + targets.join(' '), {stdio: 'inherit'});\"",
     "build": "npm run build:renderer && npm run build:electron",
-    "build:win": "npm run build:renderer && electron-builder --win --config.asar=true"
+    "build:linux": "npm run build:renderer && electron-builder --linux",
+    "build:win": "npm run build:renderer && electron-builder --win",
+    "build:mac": "npm run build:renderer && electron-builder --mac"
   },
   "dependencies": {
     "@chakra-ui/react": "^3.3.0",
@@ -67,9 +70,25 @@
   "build": {
     "appId": "com.example.cafeteriamanager",
     "productName": "Cafeteria Manager",
+    "files": [
+      "dist/**/*",
+      "dist-electron/**/*",
+      "public/**/*"
+    ],
+    "directories": {
+      "buildResources": "build",
+      "output": "dist"
+    },
     "win": {
       "target": "nsis",
       "icon": "build/icons/win/icon.ico"
+    },
+    "linux": {
+      "target": ["AppImage", "deb"],
+      "category": "Office"
+    },
+    "mac": {
+      "target": ["dmg"]
     },
     "buildDependenciesFromSource": true
   }
