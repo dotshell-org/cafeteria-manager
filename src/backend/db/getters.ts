@@ -2,7 +2,7 @@ import {db} from './config.ts'
 import {Item} from '../../types/generic/Item.ts'
 import {ItemGroup} from "../../types/generic/ItemGroup.ts";
 import { Product } from '../../types/generic/Product.ts';
-import { Order } from '../../types/generic/Order.ts';
+import { Order } from "../../types/generic/Order.ts";
 
 /**
  * Retrieves a list of items formatted for UI display based on the provided groups and a search query.

@@ -84,11 +84,26 @@ const CashRegister: React.FC<CashRegisterProps> = ({date}) => {
         // Calculate total price
         const totalPrice = itemsInCommand.reduce((acc, item) => acc + item.quantity * item.price, 0);
 
-        // Create order object
+        // Create order object with current time
+        const now = new Date();
+
+        // Use the date from props but add current time
+        const [year, month, day] = date.split('-');
+
+        // Format hours, minutes, seconds with leading zeros
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        const seconds = String(now.getSeconds()).padStart(2, '0');
+
+        // Create datetime string in format YYYY-MM-DDThh:mm:ss
+        const orderDateTime = `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
+
         const order: Omit<Order, 'id' | 'createdAt'> = {
-            date: date,
+            date: orderDateTime,
             totalPrice: totalPrice,
             items: itemsInCommand.map(item => ({
+                id: 0,
+                orderId: 0,
                 itemName: item.name,
                 itemPrice: item.price,
                 quantity: item.quantity
