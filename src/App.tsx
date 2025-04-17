@@ -7,6 +7,7 @@ import CashRegister from "./pages/CashRegister.tsx";
 import dayjs from "dayjs";
 import {AnimatePresence} from 'framer-motion';
 import EditProducts from "./pages/EditProducts.tsx";
+import History from "./pages/History.tsx";
 
 function App() {
 
@@ -84,6 +85,8 @@ function App() {
                 return <CashRegister date={selectedDateForCashRegister} key="cashregister" direction={direction}/>;
             case Tab.Objects:
                 return <EditProducts key="editproducts" direction={direction}/>;
+            case Tab.History:
+                return <History key="history" />
             default:
                 return null;
         }

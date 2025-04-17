@@ -5,6 +5,8 @@
   "total": "Total",
   "validate": "Validate",
   "quantity": "Quantity",
+  "orderSaved": "Order Saved!",
+  "error": "Error",
 
   "edit_products": "Edit Products",
   "add_product": "Add Product",
@@ -14,5 +16,8 @@
   "image": "Image",
   "change_image": "Change Image",
   "no_image": "No Image",
-  "saving": "Saving..."
+  "saving": "Saving...",
+
+  "orderHistory": "Order History",
+  "noOrders": "No orders found"
 }

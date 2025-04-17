@@ -7,6 +7,7 @@ import {ItemGroup} from "../types/generic/ItemGroup.ts";
 import ProductCard from "../components/cash-register/ProductCard.tsx";
 import { IpcRenderer } from "electron";
 import {t} from "i18next";
+import { Order } from "../types/generic/Order.ts";
 
 // Define the extended Window interface
 declare global {
@@ -58,6 +59,7 @@ const CashRegister: React.FC<CashRegisterProps> = ({date}) => {
     const [searchTerm, setSearchTerm] = useState<string>("");
     const [itemsInUI, setItemsInUI] = useState<Item[]>([]);
     const [itemsInCommand, setItemsInCommand] = useState<Item[]>([]);
+    const [orderStatus, setOrderStatus] = useState<'idle' | 'saving' | 'success' | 'error'>('idle');
 
     useEffect(() => {
         window.ipcRenderer
@@ -69,6 +71,51 @@ const CashRegister: React.FC<CashRegisterProps> = ({date}) => {
                 console.error(err);
             })
     }, [groups, searchTerm]);
+
+    const handleValidateOrder = () => {
+        // Check if there are items in the order
+        if (itemsInCommand.length === 0) {
+            return;
+        }
+
+        // Set status to saving
+        setOrderStatus('saving');
+
+        // Calculate total price
+        const totalPrice = itemsInCommand.reduce((acc, item) => acc + item.quantity * item.price, 0);
+
+        // Create order object
+        const order: Omit<Order, 'id' | 'createdAt'> = {
+            date: date,
+            totalPrice: totalPrice,
+            items: itemsInCommand.map(item => ({
+                itemName: item.name,
+                itemPrice: item.price,
+                quantity: item.quantity
+            }))
+        };
+
+        // Save order
+        window.ipcRenderer
+            .invoke("saveOrder", order)
+            .then(() => {
+                setOrderStatus('success');
+                // Clear the order after successful save
+                setItemsInCommand([]);
+                // Reset status after 3 seconds
+                setTimeout(() => {
+                    setOrderStatus('idle');
+                }, 3000);
+            })
+            .catch((err: any) => {
+                console.error(err);
+                setOrderStatus('error');
+                // Reset status after 3 seconds
+                setTimeout(() => {
+                    setOrderStatus('idle');
+                }, 3000);
+            });
+    };
 
     return (
         <div className="h-full flex flex-col">
@@ -160,7 +207,27 @@ const CashRegister: React.FC<CashRegisterProps> = ({date}) => {
                         <span className="text-2xl mt-3 text-black dark:text-white">{t("total")}</span>
                         <span className="text-2xl mt-4 font-bold text-black dark:text-white">€{itemsInCommand.reduce((acc, item) => acc + item.quantity * item.price, 0).toFixed(2)}</span>
                     </div>
-                    <button className="w-full mt-4 text-center text-lg bg-gray-100 dark:bg-gray-800">{t("validate")}</button>
+                    <button
+                        className={`w-full mt-4 p-2 text-center text-lg rounded-md transition-colors cursor-pointer ${
+                            orderStatus === 'idle' 
+                                ? 'bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700' 
+                                : orderStatus === 'saving' 
+                                    ? 'bg-blue-100 dark:bg-blue-800 cursor-wait' 
+                                    : orderStatus === 'success' 
+                                        ? 'bg-green-100 dark:bg-green-800' 
+                                        : 'bg-red-100 dark:bg-red-800'
+                        }`}
+                        onClick={handleValidateOrder}
+                        disabled={orderStatus !== 'idle' || itemsInCommand.length === 0}
+                    >
+                        {orderStatus === 'idle'
+                            ? t("validate")
+                            : orderStatus === 'saving'
+                                ? t("saving") + '...'
+                                : orderStatus === 'success'
+                                    ? t("orderSaved")
+                                    : t("error")}
+                    </button>
                 </div>
             </motion.div>
         </div>

@@ -3,6 +3,14 @@ import dayjs from 'dayjs';
 import 'dayjs/locale/fr'; // For displaying days in French
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
+import { IpcRenderer } from "electron";
+
+// Define the extended Window interface
+declare global {
+  interface Window {
+    ipcRenderer: IpcRenderer;
+  }
+}
 
 // Format days: "Mon 12 April"
 const formatDate = (date: string | number | dayjs.Dayjs | Date | null | undefined) => {
@@ -28,6 +36,8 @@ const Calendar: React.FC<CalendarInterface> = ({ onClick }) => {
     const [displayedDays, setDisplayedDays] = useState(generateDays(currentDate));
     // Direction of animation (1 for right, -1 for left)
     const [animDirection, setAnimDirection] = useState(0);
+    // State for daily sales data
+    const [dailySales, setDailySales] = useState<Record<string, number>>({});
 
     // Reference for scroll management
     const scrollContainerRef = useRef(null);
@@ -36,6 +46,24 @@ const Calendar: React.FC<CalendarInterface> = ({ onClick }) => {
     useEffect(() => {
         setDisplayedDays(generateDays(currentDate));
     }, [currentDate]);
+
+    // Fetch sales data when displayed days change
+    useEffect(() => {
+        const fetchSalesData = async () => {
+            // Format dates as YYYY-MM-DD for database query
+            const formattedDates = displayedDays.map(day => day.format('YYYY-MM-DD'));
+            // Get sales data for all displayed days using IPC
+            try {
+                const salesData = await window.ipcRenderer.invoke("getMultipleDaysSales", formattedDates);
+                setDailySales(salesData);
+            } catch (err) {
+                console.error("Error fetching sales data:", err);
+                setDailySales({});
+            }
+        };
+
+        fetchSalesData();
+    }, [displayedDays]);
 
     // Function to navigate to previous days
     const navigateToPreviousDays = () => {
@@ -77,7 +105,7 @@ const Calendar: React.FC<CalendarInterface> = ({ onClick }) => {
                 'bg-blue-300 text-blue-500',
                 'bg-blue-400 text-blue-600'
             ];
-            
+
             const darkColors = [
                 'dark:bg-blue-900 dark:text-blue-300',
                 'dark:bg-blue-800 dark:text-blue-400',
@@ -85,7 +113,7 @@ const Calendar: React.FC<CalendarInterface> = ({ onClick }) => {
                 'dark:bg-blue-600 dark:text-blue-300',
                 'dark:bg-blue-500 dark:text-blue-200'
             ];
-            
+
             return `${lightColors[day.day() - 1]} ${darkColors[day.day() - 1]}`;
         }
     };
@@ -282,7 +310,7 @@ const Calendar: React.FC<CalendarInterface> = ({ onClick }) => {
                                         className="flex items-center justify-center h-full opacity-80"
                                         style={{fontSize: `calc(2rem + 0.8vw)`}}
                                     >
-                                        €0.0
+                                        €{(dailySales[day.format('YYYY-MM-DD')] || 0).toFixed(1)}
                                     </h1>
                                 </motion.div>
                             );

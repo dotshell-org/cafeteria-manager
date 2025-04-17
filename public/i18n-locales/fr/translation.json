@@ -5,6 +5,8 @@
   "total": "Total",
   "validate": "Valider",
   "quantity": "Quantité",
+  "orderSaved": "Commande Enregistrée !",
+  "error": "Erreur",
 
   "edit_products": "Editer les produits",
   "add_product": "Ajouter un produit",
@@ -14,5 +16,8 @@
   "image": "Image",
   "change_image": "Changer l'image",
   "no_image": "Pas d'image",
-  "saving": "Enregistrement..."
+  "saving": "Enregistrement...",
+
+  "orderHistory": "Historique des commandes",
+  "noOrders": "Aucune commande trouvée"
 }

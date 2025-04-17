@@ -13,6 +13,7 @@ const NavBar: React.FC<NavBarProps> = ({ selectedTab, onTabSelected }) => {
     const items: { text: string, tab: Tab }[] = [
         { text: "📅", tab: Tab.Calendar },
         { text: "📝", tab: Tab.Objects},
+        { text: "⏳", tab: Tab.History},
         { text: "📊", tab: Tab.Stats},
         { text: "💾", tab: Tab.Export},
         { text: "⚙️", tab: Tab.Settings },

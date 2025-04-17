@@ -1,11 +1,12 @@
 import {app, BrowserWindow, ipcMain, protocol} from 'electron';
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
-import fs from 'node:fs'; // Import fs
-import crypto from 'node:crypto'; // Import crypto for unique filenames
+import fs from 'node:fs';
+import crypto from 'node:crypto';
 import '../src/backend/db/tables.ts'
-import {getGroups, getItemsForUI, getProducts} from "../src/backend/db/getters.ts"; // Import getProducts
-import { addProduct, updateProduct, deleteProduct } from '../src/backend/db/setters.ts'; // Import setters
+import {getGroups, getItemsForUI, getProducts, getOrders, getMultipleDaysSales, getDailySales} from "../src/backend/db/getters.ts";
+import { addProduct, updateProduct, deleteProduct, saveOrder } from '../src/backend/db/setters.ts';
+import {Product} from "../src/types/generic/Product.ts";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -115,6 +116,9 @@ function handleIpc(name: string, handler: (...args: any[]) => any) {
 handleIpc('getItemsForUI', getItemsForUI);
 handleIpc('getGroups', getGroups);
 handleIpc('getProducts', getProducts);
+handleIpc('getOrders', getOrders);
+handleIpc('getMultipleDaysSales', getMultipleDaysSales);
+handleIpc('getDailySales', getDailySales);
 
 handleIpc('addProduct', async (product: Omit<Product, 'id'>) => {
     return addProduct(product);
@@ -146,6 +150,10 @@ handleIpc('saveImage', async (base64Data: string, originalFileName: string) => {
     return await saveImageData(base64Data, originalFileName);
 });
 
+handleIpc('saveOrder', (order) => {
+    return saveOrder(order);
+});
+
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit()
@@ -166,6 +174,6 @@ app.whenReady().then(() => {
     const pathname = decodeURI(request.url.replace('file:///', ''));
     callback(pathname);
   });
-  
+
   createWindow();
 });
