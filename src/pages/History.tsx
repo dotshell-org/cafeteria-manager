@@ -63,7 +63,7 @@ const History: React.FC<HistoryProps> = () => {
     return (
         <div className="h-full flex flex-col">
             <motion.div
-                className="absolute right-0 bottom-0 pb-0 border border-b-0 border-gray-200 dark:border-gray-600 rounded-t-xl bg-transparent p-8 w-[calc(100%-100px)] h-[calc(100%-50px)] text-black dark:text-white flex flex-col"
+                className="absolute right-[24px] bottom-0 pb-0 border border-b-0 border-gray-200 dark:border-gray-600 rounded-t-xl bg-transparent p-8 w-[calc(100%-100px)] h-[calc(100%-50px)] text-black dark:text-white flex flex-col"
                 initial={{opacity: 0, y: 40}}
                 animate="enter"
                 exit="exit"

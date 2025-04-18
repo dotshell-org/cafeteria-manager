@@ -4,8 +4,16 @@ import path from 'node:path'
 import fs from 'node:fs';
 import crypto from 'node:crypto';
 import '../src/backend/db/tables.ts'
-import {getGroups, getItemsForUI, getProducts, getOrders, getMultipleDaysSales, getDailySales} from "../src/backend/db/getters.ts";
+import {
+  getGroups, 
+  getItemsForUI, 
+  getProducts, 
+  getOrders, 
+  getMultipleDaysSales, 
+  getDailySales,
+} from "../src/backend/db/getters.ts";
 import { addProduct, updateProduct, deleteProduct, saveOrder } from '../src/backend/db/setters.ts';
+import { getRevenueData, getOrderCountData, getProductSalesData } from '../src/backend/db/getStats.ts';
 import {Product} from "../src/types/generic/Product.ts";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
@@ -123,6 +131,9 @@ handleIpc('getProducts', getProducts);
 handleIpc('getOrders', getOrders);
 handleIpc('getMultipleDaysSales', getMultipleDaysSales);
 handleIpc('getDailySales', getDailySales);
+handleIpc('getRevenueData', getRevenueData);
+handleIpc('getOrderCountData', getOrderCountData);
+handleIpc('getProductSalesData', getProductSalesData);
 
 handleIpc('addProduct', async (product: Omit<Product, 'id'>) => {
     return addProduct(product);

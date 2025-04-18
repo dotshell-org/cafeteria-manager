@@ -11,6 +11,7 @@
   "edit_products": "Edit Products",
   "add_product": "Add Product",
   "product": "Product",
+  "products": "Products",
   "price": "Price",
   "group": "Group",
   "image": "Image",
@@ -19,5 +20,25 @@
   "saving": "Saving...",
 
   "orderHistory": "Order History",
-  "noOrders": "No orders found"
+  "noOrders": "No orders found",
+  "stats": "Stats",
+  "evolution": "Evolution",
+
+  "timeframe": "Timeframe",
+  "day": "Day",
+  "week": "Week",
+  "month": "Month",
+  "year": "Year",
+  "allTime": "All Time",
+  "orderCount": "Order Count",
+  "revenue": "Revenue",
+  "productSales": "Product Sales",
+  "totalOrders": "Total Orders",
+  "totalRevenue": "Total Revenue",
+  "date": "Date",
+  "noData": "No data available",
+  "selectCurveType": "Select Curve Type",
+  "startDate": "Start Date",
+  "endDate": "End Date",
+  "dateRange": "Date Range"
 }

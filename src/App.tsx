@@ -8,6 +8,7 @@ import dayjs from "dayjs";
 import {AnimatePresence} from 'framer-motion';
 import EditProducts from "./pages/EditProducts.tsx";
 import History from "./pages/History.tsx";
+import Stats from "./pages/Stats.tsx";
 
 function App() {
 
@@ -87,6 +88,8 @@ function App() {
                 return <EditProducts key="editproducts" direction={direction}/>;
             case Tab.History:
                 return <History key="history" />
+            case Tab.Stats:
+                return <Stats />
             default:
                 return null;
         }
