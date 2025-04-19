@@ -10,6 +10,7 @@ import EditProducts from "./pages/EditProducts.tsx";
 import History from "./pages/History.tsx";
 import Stats from "./pages/Stats.tsx";
 import Export from "./pages/Export.tsx";
+import Settings from "./pages/Settings.tsx";
 
 function App() {
 
@@ -93,6 +94,8 @@ function App() {
                 return <Stats />
             case Tab.Export:
                 return <Export key="export" />
+            case Tab.Settings:
+                return <Settings key="settings" />
             default:
                 return null;
         }

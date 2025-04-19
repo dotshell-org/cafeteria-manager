@@ -42,7 +42,7 @@
   "endDate": "Date de fin",
   "dateRange": "Plage de dates",
   "averageOrderValue": "Valeur moyenne des commandes",
-  
+
   "export": "Exportation",
   "exportFormat": "Format d'exportation",
   "weeklyReport": "Rapport hebdomadaire",
@@ -53,7 +53,7 @@
   "allOrdersDescription": "Exporter toutes les commandes avec leurs détails.",
   "allProducts": "Tous les produits",
   "allProductsDescription": "Exporter le catalogue complet des produits.",
-  
+
   "selectWeek": "Sélectionner une semaine",
   "selectMondayForWeekStart": "Sélectionnez un lundi pour le début de semaine",
   "loading": "Chargement...",
@@ -77,5 +77,14 @@
   "noProductsToExport": "Aucun produit à exporter", 
   "noSalesData": "Aucune donnée de vente pour cette période",
   "selectDateRange": "Sélectionnez une plage de dates et cliquez sur 'Charger les données'",
-  "weeklyTotal": "Total Hebdomadaire"
+  "weeklyTotal": "Total Hebdomadaire",
+
+  "settings": "Paramètres",
+  "language": "Langue",
+  "languageDescription": "Sélectionnez votre langue préférée pour l'interface de l'application.",
+  "appearance": "Apparence",
+  "appearanceDescription": "Personnalisez l'apparence de l'application.",
+  "themeFollowsSystem": "Le thème de l'application suit les préférences de votre système.",
+  "about": "À propos",
+  "aboutDescription": "Informations sur cette application."
 }

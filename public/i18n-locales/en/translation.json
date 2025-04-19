@@ -42,7 +42,7 @@
   "endDate": "End Date", 
   "dateRange": "Date Range",
   "averageOrderValue": "Average Order Value",
-  
+
   "export": "Export",
   "exportFormat": "Export Format",
   "weeklyReport": "Weekly Report",
@@ -53,7 +53,7 @@
   "allOrdersDescription": "Export all orders with their details.",
   "allProducts": "All Products",
   "allProductsDescription": "Export the complete product catalog.",
-  
+
   "selectWeek": "Select Week",
   "selectMondayForWeekStart": "Select a Monday for week start",
   "loading": "Loading...",
@@ -77,5 +77,14 @@
   "noProductsToExport": "No products to export",
   "noSalesData": "No sales data for this period",
   "selectDateRange": "Select a date range and click 'Load Data'",
-  "weeklyTotal": "Weekly Total"
+  "weeklyTotal": "Weekly Total",
+
+  "settings": "Settings",
+  "language": "Language",
+  "languageDescription": "Select your preferred language for the application interface.",
+  "appearance": "Appearance",
+  "appearanceDescription": "Customize the look and feel of the application.",
+  "themeFollowsSystem": "The application theme follows your system preferences.",
+  "about": "About",
+  "aboutDescription": "Information about this application."
 }
