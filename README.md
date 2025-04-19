@@ -1,6 +1,6 @@
 # Cafeteria Manager
 
-A modern cafeteria management software, compatible with Glome. Built with Electron, React, TypeScript, and Vite.
+A modern cafeteria management software, compatible with Ico. Built with Electron, React, TypeScript, and Vite.
 
 ## ✨ Features
 
