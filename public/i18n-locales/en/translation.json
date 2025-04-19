@@ -76,5 +76,6 @@
   "noOrdersToExport": "No orders to export",
   "noProductsToExport": "No products to export",
   "noSalesData": "No sales data for this period",
-  "selectDateRange": "Select a date range and click 'Load Data'"
+  "selectDateRange": "Select a date range and click 'Load Data'",
+  "weeklyTotal": "Weekly Total"
 }

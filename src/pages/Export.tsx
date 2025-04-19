@@ -526,27 +526,27 @@ const Export: React.FC = () => {
                                         <table className="min-w-full border-collapse table-auto">
                                             <thead className="bg-gray-50 dark:bg-gray-800">
                                             <tr>
-                                                <th className="border px-4 py-2 text-left">{t("product")}</th>
-                                                <th className="border px-4 py-2 text-right">{t("price")}</th>
-                                                <th className="border px-4 py-2 text-right">{t("totalQuantity")}</th>
-                                                <th className="border px-4 py-2 text-right">{t("totalRevenue")}</th>
+                                                <th className="border px-4 py-2 text-left  dark:border-gray-600">{t("product")}</th>
+                                                <th className="border px-4 py-2 text-right dark:border-gray-600">{t("price")}</th>
+                                                <th className="border px-4 py-2 text-right dark:border-gray-600">{t("totalQuantity")}</th>
+                                                <th className="border px-4 py-2 text-right dark:border-gray-600">{t("totalRevenue")}</th>
                                             </tr>
                                             </thead>
                                             <tbody>
                                             {weeklyReportData.products && weeklyReportData.products.map((product: any, index: number) => (
                                                 <tr key={index}
                                                     className="bg-white dark:bg-gray-700">
-                                                    <td className="border px-4 py-2">{product.name}</td>
-                                                    <td className="border px-4 py-2 text-right">€{product.price.toFixed(2)}</td>
-                                                    <td className="border px-4 py-2 text-right">{product.totalQuantity}</td>
-                                                    <td className="border px-4 py-2 text-right">€{product.totalRevenue.toFixed(2)}</td>
+                                                    <td className="border px-4 py-2 dark:border-gray-600">{product.name}</td>
+                                                    <td className="border px-4 py-2 text-right dark:border-gray-600">€{product.price.toFixed(2)}</td>
+                                                    <td className="border px-4 py-2 text-right dark:border-gray-600">{product.totalQuantity}</td>
+                                                    <td className="border px-4 py-2 text-right dark:border-gray-600">€{product.totalRevenue.toFixed(2)}</td>
                                                 </tr>
                                             ))}
                                             <tr className="bg-gray-50 dark:bg-gray-800 font-semibold">
                                                 <td colSpan={3}
-                                                    className="border px-4 py-2 text-right">{t("weeklyTotal")}:
+                                                    className="border px-4 py-2 text-right dark:border-gray-600">{t("weeklyTotal")}:
                                                 </td>
-                                                <td className="border px-4 py-2 text-right">€{weeklyReportData.weeklyTotal?.toFixed(2)}</td>
+                                                <td className="border px-4 py-2 text-right dark:border-gray-600">€{weeklyReportData.weeklyTotal?.toFixed(2)}</td>
                                             </tr>
                                             </tbody>
                                         </table>
@@ -646,26 +646,26 @@ const Export: React.FC = () => {
                                                 <table className="min-w-full border-collapse table-auto">
                                                     <thead className="bg-gray-50 dark:bg-gray-800">
                                                     <tr>
-                                                        <th className="border px-4 py-2 text-left">{t("product")}</th>
-                                                        <th className="border px-4 py-2 text-right">{t("price")}</th>
-                                                        <th className="border px-4 py-2 text-right">{t("totalQuantity")}</th>
-                                                        <th className="border px-4 py-2 text-right">{t("totalRevenue")}</th>
+                                                        <th className="border px-4 py-2 text-left dark:border-gray-600">{t("product")}</th>
+                                                        <th className="border px-4 py-2 text-right dark:border-gray-600">{t("price")}</th>
+                                                        <th className="border px-4 py-2 text-right dark:border-gray-600">{t("totalQuantity")}</th>
+                                                        <th className="border px-4 py-2 text-right dark:border-gray-600">{t("totalRevenue")}</th>
                                                     </tr>
                                                     </thead>
                                                     <tbody>
                                                     {salesSummaryData.map((item: any, index: number) => (
                                                         <tr key={index}>
-                                                            <td className="border px-4 py-2">{item.item_name}</td>
-                                                            <td className="border px-4 py-2 text-right">€{Number(item.item_price).toFixed(2)}</td>
-                                                            <td className="border px-4 py-2 text-right">{item.total_quantity}</td>
-                                                            <td className="border px-4 py-2 text-right">€{Number(item.total_revenue).toFixed(2)}</td>
+                                                            <td className="border px-4 py-2 dark:border-gray-600">{item.item_name}</td>
+                                                            <td className="border px-4 py-2 text-right dark:border-gray-600">€{Number(item.item_price).toFixed(2)}</td>
+                                                            <td className="border px-4 py-2 text-right dark:border-gray-600">{item.total_quantity}</td>
+                                                            <td className="border px-4 py-2 text-right dark:border-gray-600">€{Number(item.total_revenue).toFixed(2)}</td>
                                                         </tr>
                                                     ))}
                                                     </tbody>
                                                     <tfoot>
                                                         <tr className="bg-gray-100 dark:bg-gray-800 font-semibold">
-                                                            <td className="border px-4 py-2 text-right" colSpan={3}>{t("total")}:</td>
-                                                            <td className="border px-4 py-2 text-right">
+                                                            <td className="border px-4 py-2 text-right dark:border-gray-600" colSpan={3}>{t("total")}:</td>
+                                                            <td className="border px-4 py-2 text-right dark:border-gray-600">
                                                                 €{salesSummaryData.reduce((sum: any, item: { total_revenue: any; }) => sum + (Number(item.total_revenue) || 0), 0).toFixed(2)}
                                                             </td>
                                                         </tr>

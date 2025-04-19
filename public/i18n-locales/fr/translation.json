@@ -76,5 +76,6 @@
   "noOrdersToExport": "Aucune commande à exporter",
   "noProductsToExport": "Aucun produit à exporter", 
   "noSalesData": "Aucune donnée de vente pour cette période",
-  "selectDateRange": "Sélectionnez une plage de dates et cliquez sur 'Charger les données'"
+  "selectDateRange": "Sélectionnez une plage de dates et cliquez sur 'Charger les données'",
+  "weeklyTotal": "Total Hebdomadaire"
 }

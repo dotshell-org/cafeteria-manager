@@ -388,8 +388,6 @@ export function getOrderCountData(timeframe: TimeFrame): ChartDataPoint[] {
  * Get top product sales for a date range
  */
 export function getProductSalesData(startDate: string, endDate: string): PieChartDataPoint[] {
-    console.log('getProductSalesData', startDate, endDate);
-
     // Ensure dates are treated as full days for the query
     const startOfDay = dayjs(startDate).startOf('day').toISOString();
     const endOfDay = dayjs(endDate).endOf('day').toISOString();
