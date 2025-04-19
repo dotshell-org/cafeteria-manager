@@ -654,8 +654,7 @@ const Export: React.FC = () => {
                                                     </thead>
                                                     <tbody>
                                                     {salesSummaryData.map((item: any, index: number) => (
-                                                        <tr key={index}
-                                                            className="bg-white dark:bg-gray-700">
+                                                        <tr key={index}>
                                                             <td className="border px-4 py-2">{item.item_name}</td>
                                                             <td className="border px-4 py-2 text-right">€{Number(item.item_price).toFixed(2)}</td>
                                                             <td className="border px-4 py-2 text-right">{item.total_quantity}</td>
