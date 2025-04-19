@@ -9,6 +9,7 @@ import {AnimatePresence} from 'framer-motion';
 import EditProducts from "./pages/EditProducts.tsx";
 import History from "./pages/History.tsx";
 import Stats from "./pages/Stats.tsx";
+import Export from "./pages/Export.tsx";
 
 function App() {
 
@@ -90,6 +91,8 @@ function App() {
                 return <History key="history" />
             case Tab.Stats:
                 return <Stats />
+            case Tab.Export:
+                return <Export key="export" />
             default:
                 return null;
         }

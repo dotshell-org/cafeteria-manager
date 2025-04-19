@@ -18,5 +18,11 @@ interface Window {
     getRevenueData: (timeframe: TimeFrame, startDate: string | null, endDate: string | null) => Promise<any>
     getOrderCountData: (timeframe: TimeFrame, startDate: string | null, endDate: string | null) => Promise<any>
     getProductSalesData: (startDate: string, endDate: string) => Promise<any>
+    
+    // Export functions
+    getWeeklySalesReport: (weekStartDate: string) => Promise<any>
+    getAllOrders: () => Promise<any>
+    getSalesSummary: (startDate: string, endDate: string) => Promise<any>
+    getAllProductsForExport: () => Promise<any>
   }
 }
