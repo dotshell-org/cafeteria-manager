@@ -47,6 +47,7 @@ function createWindow() {
   win = new BrowserWindow({
     minWidth: 1000,
     minHeight: 650,
+    icon: path.join(process.env.VITE_PUBLIC || '', 'app-icon.png'),
     webPreferences: {
       preload: path.join(__dirname, 'preload.mjs'),
       webSecurity: false, // Permettre le chargement des ressources locales

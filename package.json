@@ -3,8 +3,7 @@
   "private": true,
   "version": "0.0.0",
   "description": "A modern cafeteria manager software compatible with Glome.",
-  "author": "Dotshell",
-  "email": "tristan.gscn@proton.me",
+  "author": "Dotshell <tristan.gscn@proton.me>",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -76,25 +75,35 @@
       "public/**/*"
     ],
     "directories": {
-      "buildResources": "build",
+      "buildResources": "public",
       "output": "dist"
     },
     "win": {
       "target": "nsis",
-      "icon": "build/icons/win/icon.ico"
+      "icon": "public/app-icon.png"
     },
     "linux": {
       "target": [
         "AppImage",
         "deb"
       ],
-      "category": "Office"
+      "category": "Office",
+      "maintainer": "Dotshell <tristan.gscn@proton.me>",
+      "icon": "public/app-icon.png"
     },
     "mac": {
       "target": [
         "dmg"
-      ]
+      ],
+      "icon": "public/app-icon.png"
     },
-    "buildDependenciesFromSource": true
+    "buildDependenciesFromSource": true,
+    "extraResources": [
+      {
+        "from": "public",
+        "to": "public",
+        "filter": ["app-icon.png"]
+      }
+    ]
   }
 }

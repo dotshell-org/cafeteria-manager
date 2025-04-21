@@ -1,21 +1,28 @@
 // @see - https://www.electron.build/configuration/configuration
 {
   "$schema": "https://raw.githubusercontent.com/electron-userland/electron-builder/master/packages/app-builder-lib/scheme.json",
-  "appId": "YourAppID",
+  "appId": "com.cafeteriamanager.app",
   "asar": true,
-  "productName": "YourAppName",
+  "productName": "Cafeteria Manager",
+  "author": {
+    "name": "Cafeteria Manager Team",
+    "email": "contact@example.com"
+  },
   "directories": {
-    "output": "release/${version}"
+    "output": "release/${version}",
+    "buildResources": "public"
   },
   "files": [
     "dist",
-    "dist-electron"
+    "dist-electron",
+    "public/**/*"
   ],
   "mac": {
     "target": [
       "dmg"
     ],
-    "artifactName": "${productName}-Mac-${version}-Installer.${ext}"
+    "artifactName": "${productName}-Mac-${version}-Installer.${ext}",
+    "icon": "public/app-icon.png"
   },
   "win": {
     "target": [
@@ -26,7 +33,8 @@
         ]
       }
     ],
-    "artifactName": "${productName}-Windows-${version}-Setup.${ext}"
+    "artifactName": "${productName}-Windows-${version}-Setup.${ext}",
+    "icon": "public/app-icon.png"
   },
   "nsis": {
     "oneClick": false,
@@ -39,6 +47,20 @@
       "AppImage",
       "deb"
     ],
-    "artifactName": "${productName}-Linux-${version}.${ext}"
+    "artifactName": "${productName}-Linux-${version}.${ext}",
+    "icon": "public/app-icon.png",
+    "category": "Utility",
+    "desktop": {
+      "Name": "Cafeteria Manager",
+      "Icon": "cafeteria-manager",
+      "Terminal": false,
+      "Type": "Application",
+      "Categories": "Utility;Office"
+    },
+    "maintainer": "Cafeteria Manager Team <contact@example.com>"
+  },
+  "appImage": {
+    "systemIntegration": "ask",
+    "license": "LICENSE"
   }
 }
