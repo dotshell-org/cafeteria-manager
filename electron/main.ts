@@ -16,6 +16,7 @@ import { addProduct, updateProduct, deleteProduct, saveOrder } from '../src/back
 import { getRevenueData, getOrderCountData, getProductSalesData } from '../src/backend/db/getStats.ts';
 import { getWeeklySalesReport, getAllOrders, getSalesSummary, getAllProducts } from '../src/backend/export/exportData.js';
 import {Product} from "../src/types/generic/Product.ts";
+import {getLanguagePreference, saveLanguagePreference} from "../src/backend/db/settings.ts";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -142,6 +143,10 @@ handleIpc('getWeeklySalesReport', getWeeklySalesReport);
 handleIpc('getAllOrders', getAllOrders);
 handleIpc('getSalesSummary', getSalesSummary);
 handleIpc('getAllProductsForExport', getAllProducts);
+
+// Settings
+handleIpc("saveLanguagePreference", saveLanguagePreference);
+handleIpc("getLanguagePreference", getLanguagePreference);
 
 handleIpc('addProduct', async (product: Omit<Product, 'id'>) => {
     return addProduct(product);

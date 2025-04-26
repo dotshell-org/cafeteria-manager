@@ -19,9 +19,11 @@ const variants = {
 const Settings: React.FC = () => {
     const { t, i18n } = useTranslation();
 
-    // Function to change language
+    // Function to change language and save preference
     const changeLanguage = (lng: string) => {
         i18n.changeLanguage(lng);
+        // Save language preference to database
+        (window as any).ipcRenderer.invoke("saveLanguagePreference", lng);
     };
 
     return (
