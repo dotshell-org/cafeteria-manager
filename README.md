@@ -73,4 +73,4 @@ If you plan to contribute, please:
 
 ## 📄 License
 
-Distributed under the MIT License. See `LICENSE` for more information.
+Distributed under the GPLv3.0 License. See `LICENSE` for more information.
