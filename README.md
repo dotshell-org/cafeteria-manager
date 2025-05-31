@@ -1,4 +1,6 @@
 # Cafeteria Manager
+[![GitHub license](https://img.shields.io/badge/license-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+[![Dependabot badge](https://badgen.net/github/dependabot/dotshell-org/cafeteria-manager)](https://github.com/dotshell-org/cafeteria-manager/pulls?q=is%3Apr+author%3Aapp%2Fdependabot)
 
 A modern cafeteria management software, compatible with Ico. Built with Electron, React, TypeScript, and Vite.
 
