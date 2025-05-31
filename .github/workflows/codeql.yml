@@ -2,11 +2,14 @@ name: "CodeQL Advanced"
 
 on:
   push:
-    branches: [ "main" ]
+    # Ne lancer la construction/publikation Electron que sur un push de tag (recommandé)
+    # Vous pouvez aussi le garder sur main, mais on explique plus bas comment éviter les releases hebdo
+    tags: 
+      - 'v*.*.*'       # par exemple, « v1.2.3 »
   pull_request:
     branches: [ "main" ]
   schedule:
-    - cron: '0 6 * * 1'
+    - cron: '0 6 * * 1'  # toujours exécuter CodeQL pour l'analyse de sécurité
 
 jobs:
   analyze:
@@ -25,6 +28,7 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
       - name: Setup Node.js v22
         uses: actions/setup-node@v3
         with:
@@ -38,8 +42,17 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Build project
+      - name: Build project (compilation TS, bundling, etc.)
         run: npm run build --if-present
 
+      - name: Publish Electron packages
+        # Cette étape ne sera déclenchée que si on est sur un tag (cf. la section `on.push.tags` ci-dessus)
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        run: |
+          echo "Running electron-builder to generate .AppImage, .deb, etc., and publish Release"
+          npx electron-builder --config.asar=true --linux --win --mac
+      
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3
