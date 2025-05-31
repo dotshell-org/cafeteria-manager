@@ -55,7 +55,7 @@
     "electron": "^30.0.1",
     "electron-builder": "^24.13.3",
     "electron-rebuild": "^3.2.9",
-    "eslint": "^8.57.0",
+    "eslint": "^9.28.0",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.20",
     "postcss-loader": "^8.1.1",
