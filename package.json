@@ -41,7 +41,7 @@
     "tesseract.js": "^6.0.0"
   },
   "devDependencies": {
-    "@electron/rebuild": "^3.7.1",
+    "@electron/rebuild": "^4.0.1",
     "@types/better-sqlite3": "^7.6.12",
     "@types/mongodb": "^4.0.7",
     "@types/react": "^18.2.64",
