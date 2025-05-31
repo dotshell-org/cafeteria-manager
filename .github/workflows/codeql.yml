@@ -45,7 +45,7 @@ jobs:
         run: npm ci
 
       - name: Build project (compilation TS, bundling, etc.)
-        run: npm run build --if-present
+        run: npm run build:ci
 
       - name: Publish Electron packages
         # Cette étape ne sera déclenchée que si on est sur un tag (cf. la section `on.push.tags` ci-dessus)
