@@ -47,8 +47,6 @@ jobs:
         run: npm run build:ci
 
       - name: Publish Electron packages
-        # Cette étape ne sera déclenchée que si on est sur un tag (cf. la section `on.push.tags` ci-dessus)
-        if: startsWith(github.ref, 'refs/tags/v')
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
