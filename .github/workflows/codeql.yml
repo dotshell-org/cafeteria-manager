@@ -52,7 +52,7 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
-          sudo apt-get install -y ruby ruby-dev build-essential
+          sudo apt-get install -y ruby ruby-dev build-essential libgtk-3-0 libnotify4 libnss3 libxss1 libxtst6 xdg-utils libatspi2.0-0 libuuid1 libsecret-1-0 libappindicator3-1
           sudo gem install fpm
       # ─────────────────────────────────────────────────────────────────────────────
 
@@ -61,6 +61,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
           # Force electron-builder à utiliser fpm installé sur la machine
           USE_SYSTEM_FPM: "true"
+          DEBUG: "electron-builder"
         run: |
           echo "Running electron-builder to generate .AppImage, .deb, etc., and publish Release"
           npx electron-builder --config.asar=true --linux --win --publish always
