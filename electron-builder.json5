@@ -60,7 +60,6 @@
     "maintainer": "Cafeteria Manager Team <contact@example.com>"
   },
   "appImage": {
-    "systemIntegration": "ask",
     "license": "LICENSE"
   }
 }
