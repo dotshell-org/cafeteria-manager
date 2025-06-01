@@ -16,7 +16,7 @@
     "build:win": "npm run build:renderer && electron-builder --win",
     "build:mac": "npm run build:renderer && electron-builder --mac",
     "dev": "vite",
-    "rebuild": "electron-rebuild -f -w better-sqlite3",
+    "rebuild": "@electron/rebuild -f -w better-sqlite3",
     "postinstall": "electron-builder install-app-deps"
   },
   "dependencies": {
@@ -46,7 +46,6 @@
   "devDependencies": {
     "@electron/rebuild": "^4.0.1",
     "@types/better-sqlite3": "^7.6.12",
-    "@types/mongodb": "^4.0.7",
     "@types/react": "^18.2.64",
     "@types/react-dom": "^18.2.21",
     "@types/react-i18next": "^7.8.3",
@@ -57,7 +56,6 @@
     "autoprefixer": "^10.4.20",
     "electron": "^30.0.1",
     "electron-builder": "^24.13.3",
-    "electron-rebuild": "^3.2.9",
     "eslint": "^8.57.1",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.20",
