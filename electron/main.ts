@@ -51,7 +51,7 @@ function createWindow() {
     icon: path.join(process.env.VITE_PUBLIC || '', 'app-icon.png'),
     webPreferences: {
       preload: path.join(__dirname, 'preload.mjs'),
-      webSecurity: false, // Permettre le chargement des ressources locales
+      webSecurity: true,
     },
   })
 
