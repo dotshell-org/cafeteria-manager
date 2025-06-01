@@ -1,5 +1,5 @@
-import { db } from './config.ts';
-import { Product } from '../../types/generic/Product.ts';
+import { db } from './config.js';
+import { Product } from '../../types/generic/Product.js';
 
 // Add a new product and return its new id
 export function addProduct(product: Omit<Product, 'id'>): number {

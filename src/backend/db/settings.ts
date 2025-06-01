@@ -1,4 +1,4 @@
-import { db } from './config.ts';
+import { db } from './config.js';
 
 // Create settings table if it doesn't exist
 db.exec(`

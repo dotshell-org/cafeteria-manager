@@ -1,8 +1,8 @@
-import {db} from './config';
+import {db} from './config.js';
 import dayjs from 'dayjs';
-import {TimeFrame} from '../../types/DailySales';
-import utc from 'dayjs/plugin/utc'; // Import UTC plugin
-import isBetween from 'dayjs/plugin/isBetween'; // Import isBetween plugin
+import {TimeFrame} from '../../types/DailySales.js';
+import utc from 'dayjs/plugin/utc.js'; // Import UTC plugin
+import isBetween from 'dayjs/plugin/isBetween.js'; // Import isBetween plugin
 
 dayjs.extend(utc); // Extend dayjs with UTC plugin
 dayjs.extend(isBetween); // Extend dayjs with isBetween plugin

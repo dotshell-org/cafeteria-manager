@@ -1,8 +1,8 @@
-import {db} from './config.ts'
-import {Item} from '../../types/generic/Item.ts'
-import {ItemGroup} from "../../types/generic/ItemGroup.ts";
-import { Product } from '../../types/generic/Product.ts';
-import { Order } from "../../types/generic/Order.ts";
+import {db} from './config.js'
+import {Item} from '../../types/generic/Item.js'
+import {ItemGroup} from "../../types/generic/ItemGroup.js";
+import { Product } from '../../types/generic/Product.js';
+import { Order } from "../../types/generic/Order.js";
 
 /**
  * Retrieves a list of items formatted for UI display based on the provided groups and a search query.
@@ -214,13 +214,13 @@ export function getSalesSummary(startDate: string, endDate: string): any[] {
         GROUP BY item_name, item_price
         ORDER BY total_revenue DESC;
     `;
-    
+
     // Add time to include the entire end day
     const endWithTime = endDate + ' 23:59:59';
-    
+
     const stmt = db.prepare(query);
     const results = stmt.all(startDate, endWithTime);
-    
+
     // Format the results
     return results.map((row: any) => ({
         item_name: row.item_name,
