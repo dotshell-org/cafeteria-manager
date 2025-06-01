@@ -9,7 +9,7 @@ on:
   pull_request:
     branches: [ "main" ]
   schedule:
-    - cron: '0 6 * * 1'  # toujours exécuter CodeQL pour l'analyse de sécurité
+    - cron: '0 15 * * 0'  # toujours exécuter CodeQL pour l'analyse de sécurité
 
 jobs:
   analyze:
