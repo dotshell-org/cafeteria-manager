@@ -1,6 +1,7 @@
 name: "CodeQL Advanced"
 
 on:
+  workflow_dispatch:
   push:
     # Ne lancer la construction/publikation Electron que sur un push de tag (recommandé)
     # Vous pouvez aussi le garder sur main, mais on explique plus bas comment éviter les releases hebdo
