@@ -3,7 +3,7 @@ name: "CodeQL Advanced"
 on:
   workflow_dispatch:
   push:
-    # Ne lancer la construction/publikation Electron que sur un push de tag (recommandé)
+    # Ne lancer la construction/publication Electron que sur un push de tag (recommandé)
     # Vous pouvez aussi le garder sur main, mais on explique plus bas comment éviter les releases hebdo
     tags: 
       - 'v*.*.*'       # par exemple, « v1.2.3 »
@@ -46,9 +46,21 @@ jobs:
       - name: Build project (compilation TS, bundling, etc.)
         run: npm run build:ci
 
+      # ─────────────────────────────────────────────────────────────────────────────
+      # Ajout de l’installation de Ruby + FPM pour forcer l’utilisation de la version système
+      - name: Install Ruby and FPM
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ruby ruby-dev build-essential
+          sudo gem install fpm
+      # ─────────────────────────────────────────────────────────────────────────────
+
       - name: Publish Electron packages
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          # Force electron-builder à utiliser fpm installé sur la machine
+          USE_SYSTEM_FPM: "true"
         run: |
           echo "Running electron-builder to generate .AppImage, .deb, etc., and publish Release"
           npx electron-builder --config.asar=true --linux --win --publish always
