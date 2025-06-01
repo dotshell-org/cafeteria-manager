@@ -1,4 +1,4 @@
-import { db } from './config.ts';
+import { db } from './config.js';
 
 db.exec(`
     CREATE TABLE IF NOT EXISTS items (

@@ -3,7 +3,7 @@ import { fileURLToPath } from 'node:url'
 import path from 'node:path'
 import fs from 'node:fs';
 import crypto from 'node:crypto';
-import '../src/backend/db/tables.ts'
+import '../src/backend/db/tables.js'
 import {
   getGroups, 
   getItemsForUI, 
@@ -11,12 +11,12 @@ import {
   getOrders, 
   getMultipleDaysSales, 
   getDailySales,
-} from "../src/backend/db/getters.ts";
-import { addProduct, updateProduct, deleteProduct, saveOrder } from '../src/backend/db/setters.ts';
-import { getRevenueData, getOrderCountData, getProductSalesData } from '../src/backend/db/getStats.ts';
+} from "../src/backend/db/getters.js";
+import { addProduct, updateProduct, deleteProduct, saveOrder } from '../src/backend/db/setters.js';
+import { getRevenueData, getOrderCountData, getProductSalesData } from '../src/backend/db/getStats.js';
 import { getWeeklySalesReport, getAllOrders, getSalesSummary, getAllProducts } from '../src/backend/export/exportData.js';
-import {Product} from "../src/types/generic/Product.ts";
-import {getLanguagePreference, saveLanguagePreference} from "../src/backend/db/settings.ts";
+import {Product} from "../src/types/generic/Product.js";
+import {getLanguagePreference, saveLanguagePreference} from "../src/backend/db/settings.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -153,7 +153,7 @@ handleIpc('addProduct', async (product: Omit<Product, 'id'>) => {
 });
 
 handleIpc('updateProduct', async (product: Product) => {
-    const oldProduct = getProducts().find(p => p.id === product.id);
+    const oldProduct = getProducts().find((p: Product) => p.id === product.id);
     const oldImagePath = oldProduct?.image;
 
     updateProduct(product);
@@ -164,7 +164,7 @@ handleIpc('updateProduct', async (product: Product) => {
 });
 
 handleIpc('deleteProduct', async (productId: number) => {
-    const productToDelete = getProducts().find(p => p.id === productId);
+    const productToDelete = getProducts().find((p: Product) => p.id === productId);
     const imagePathToDelete = productToDelete?.image;
 
     deleteProduct(productId);

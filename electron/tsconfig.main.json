@@ -4,13 +4,15 @@
     "module": "NodeNext",
     "strict": true,
     "outDir": "../dist-electron",
-    "rootDir": ".",
+    "rootDir": "..",
     "esModuleInterop": true,
     "sourceMap": false,
     "skipLibCheck": true
   },
   "include": [
     "main.ts",
-    "preload.ts"
+    "preload.ts",
+    "../src/backend/**/*.ts",
+    "../src/types/**/*.ts"
   ]
 }

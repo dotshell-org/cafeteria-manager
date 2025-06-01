@@ -1,6 +1,6 @@
-import { db } from '../db/config';
+import { db } from '../db/config.js';
 import dayjs from 'dayjs';
-import 'dayjs/plugin/isoWeek';
+import 'dayjs/plugin/isoWeek.js';
 
 /**
  * Gets all products for export
@@ -73,16 +73,16 @@ export function getAllOrders(): any[] {
 export function getWeeklySalesReport(weekStartDate: string): any {
     // Create dayjs instance
     const dayjs_week = dayjs(weekStartDate);
-    
+
     // Calculate the end date (6 days after start date, for a full week)
     const weekEndDate = dayjs_week.add(6, 'day').format('YYYY-MM-DD');
-    
+
     // Generate all dates in the week
     const weekDays = [];
     for (let i = 0; i < 7; i++) {
         weekDays.push(dayjs_week.add(i, 'day').format('YYYY-MM-DD'));
     }
-    
+
     // Query to get all orders for the week
     const ordersQuery = `
         SELECT 
@@ -97,15 +97,15 @@ export function getWeeklySalesReport(weekStartDate: string): any {
         WHERE date >= ? AND date <= ?
         ORDER BY o.date;
     `;
-    
+
     const stmt = db.prepare(ordersQuery);
     // Include the entire end day
     const results = stmt.all(weekStartDate, weekEndDate + ' 23:59:59');
-    
+
     // Group results by product
     const productMap = new Map();
     let weeklyTotal = 0;
-    
+
     results.forEach((row: any) => {
         const date = row.date.split('T')[0].split(' ')[0]; // Extract date part
         const revenue = row.item_price * row.quantity;
@@ -162,7 +162,4 @@ export function getSalesSummary(startDate: string, endDate: string) {
     `;
 
     return db.prepare(query).all(startDate, endDate);
-
-
-    return db.prepare(query).all();
 }
