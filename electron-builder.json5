@@ -4,10 +4,6 @@
   "appId": "com.cafeteriamanager.app",
   "asar": true,
   "productName": "Cafeteria Manager",
-  "author": {
-    "name": "Cafeteria Manager Team",
-    "email": "contact@example.com"
-  },
   "directories": {
     "output": "release/${version}",
     "buildResources": "public"
