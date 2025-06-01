@@ -40,7 +40,6 @@
     "react-i18next": "^15.4.0",
     "react-router-dom": "^7.1.1",
     "recharts": "^2.15.1",
-    "sqlite3": "^5.1.7",
     "tesseract.js": "^6.0.0"
   },
   "devDependencies": {
