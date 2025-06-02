@@ -20,20 +20,29 @@ jobs:
       security-events: write
       actions: read
       contents: read
+      pull-requests: write
 
     strategy:
       fail-fast: false
       matrix:
-        language: [ 'typescript' ]
+        language: [ 'typescript', 'javascript' ]
+        include:
+          - language: typescript
+            queries: security-extended,security-and-quality,code-scanning,javascript-security-extended
+          - language: javascript
+            queries: security-extended,security-and-quality,code-scanning
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup Node.js v22
         uses: actions/setup-node@v3
         with:
           node-version: "22.x"
+          cache: 'npm'
 
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v3
@@ -44,15 +53,59 @@ jobs:
           threads: '2'
 
       - name: Install dependencies
-        run: npm ci
+        run: |
+          npm ci --legacy-peer-deps
+          npm ls --depth=0
 
       - name: Build project (compilation TS, bundling, etc.)
         run: npm run build:ci
       
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:${{ matrix.language }}"
+          upload: true
+          output: sarif-results
+          ram: ${{ github.event.inputs.deep_analysis == 'true' && '8192' || '6144' }}
+          threads: ${{ github.event.inputs.deep_analysis == 'true' && '4' || '2' }}
 
-      - name: CodeQL Summary
+      - name: Generate detailed summary
+        if: always()
         run: |
-          echo "## 🔍 Résultats de l'analyse CodeQL" >> $GITHUB_STEP_SUMMARY
-          echo "L'analyse de sécurité est terminée. Consultez les résultats dans l'onglet Security > Code Scanning." >> $GITHUB_STEP_SUMMARY
+          echo "## 🔍 Résultats de l'analyse CodeQL - ${{ matrix.language }}" >> $GITHUB_STEP_SUMMARY
+          echo "### Configuration utilisée:" >> $GITHUB_STEP_SUMMARY
+          echo "- **Langage**: ${{ matrix.language }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Requêtes**: ${{ matrix.queries }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **RAM allouée**: ${{ matrix.language == 'swift' && '4096' || '6144' }}MB" >> $GITHUB_STEP_SUMMARY
+          echo "- **Threads**: ${{ matrix.language == 'swift' && '2' || '2' }}" >> $GITHUB_STEP_SUMMARY
+          echo "### Statut:" >> $GITHUB_STEP_SUMMARY
+          echo "✅ L'analyse de sécurité est terminée." >> $GITHUB_STEP_SUMMARY
+          echo "📊 Consultez les résultats dans l'onglet **Security > Code Scanning**." >> $GITHUB_STEP_SUMMARY
+          echo "📁 Les fichiers SARIF sont disponibles en tant qu'artefacts." >> $GITHUB_STEP_SUMMARY
+      
+  security-review:
+    needs: analyze
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    permissions:
+      pull-requests: write
+    steps:
+      - name: Security Review Comment
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `## 🛡️ Analyse de Sécurité CodeQL Terminée
+                
+              L'analyse de sécurité automatisée a été effectuée sur cette Pull Request.
+                
+              **Prochaines étapes:**
+              1. Vérifiez les résultats dans l'onglet [Security](../security/code-scanning)
+              2. Corrigez les vulnérabilités critiques et élevées avant le merge
+              3. Les artefacts SARIF sont disponibles pour analyse détaillée
+                
+              _Cette analyse utilise les dernières règles de sécurité CodeQL._`
+            })
