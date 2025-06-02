@@ -242,7 +242,7 @@ const Stats: React.FC = () => {
                 </motion.div>
             </div>
         </>
-    )
+    );
 }
 
 export default Stats;
