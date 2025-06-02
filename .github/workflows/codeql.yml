@@ -83,27 +83,27 @@ jobs:
           echo "📊 Consultez les résultats dans l'onglet **Security > Code Scanning**." >> $GITHUB_STEP_SUMMARY
           echo "📁 Les fichiers SARIF sont disponibles en tant qu'artefacts." >> $GITHUB_STEP_SUMMARY
       
-    security-review:
-    needs: analyze
-    runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request'
-    steps:
-      - name: Security Review Comment
-        uses: actions/github-script@v7
-        with:
-          script: |
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: `## 🛡️ Analyse de Sécurité CodeQL Terminée
+  security-review:
+  needs: analyze
+  runs-on: ubuntu-latest
+  if: github.event_name == 'pull_request'
+  steps:
+    - name: Security Review Comment
+      uses: actions/github-script@v7
+      with:
+        script: |
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: `## 🛡️ Analyse de Sécurité CodeQL Terminée
               
-              L'analyse de sécurité automatisée a été effectuée sur cette Pull Request.
+            L'analyse de sécurité automatisée a été effectuée sur cette Pull Request.
               
-              **Prochaines étapes:**
-              1. Vérifiez les résultats dans l'onglet [Security](../security/code-scanning)
-              2. Corrigez les vulnérabilités critiques et élevées avant le merge
-              3. Les artefacts SARIF sont disponibles pour analyse détaillée
+            **Prochaines étapes:**
+            1. Vérifiez les résultats dans l'onglet [Security](../security/code-scanning)
+            2. Corrigez les vulnérabilités critiques et élevées avant le merge
+            3. Les artefacts SARIF sont disponibles pour analyse détaillée
               
-              _Cette analyse utilise les dernières règles de sécurité CodeQL._`
-            })
+            _Cette analyse utilise les dernières règles de sécurité CodeQL._`
+          })
