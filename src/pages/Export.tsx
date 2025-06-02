@@ -135,7 +135,7 @@ const Export: React.FC = () => {
         
         if (!weeklyReportData) {
             await loadWeeklySalesReport();
-            if (!weeklyReportData) return; // If loading failed
+            return; // If loading failed
         }
         
         try {
