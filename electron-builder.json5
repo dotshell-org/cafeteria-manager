@@ -30,7 +30,7 @@
       }
     ],
     "artifactName": "${productName}-Windows-${version}-Setup.${ext}",
-    "icon": "public/app-icon.png"
+    "icon": "public/app-icon-windows-linux.png"
   },
   "nsis": {
     "oneClick": false,
@@ -44,7 +44,7 @@
       "deb"
     ],
     "artifactName": "${productName}-Linux-${version}.${ext}",
-    "icon": "public/app-icon.png",
+    "icon": "public/app-icon-windows-linux.png",
     "category": "Utility",
     "desktop": {
       "Name": "Cafeteria Manager",
