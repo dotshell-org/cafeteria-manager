@@ -179,17 +179,11 @@ function createWeeklyReportWorkbook(weeklyReportData: any, locale: string): XLSX
     totalRow.push(grandTotalText);
     totalRow.push(totalWeeklyRevenue.toFixed(2));
     worksheetData.push(totalRow);
-    
-    // Create worksheet
+      // Create worksheet
     const ws = XLSX.utils.aoa_to_sheet(worksheetData);
     
-    // Set column widths for better readability
-    const colWidths = [
-        { wch: 30 }, // Product name column (wider for product name + price)
-        ...weekDays.map(() => ({ wch: 12 })), // Day columns
-        { wch: 15 }, // Total quantity
-        { wch: 18 }  // Total revenue
-    ];
+    // Calculate optimal column widths based on content
+    const colWidths = calculateOptimalColumnWidths(worksheetData);
     ws['!cols'] = colWidths;
     
     // Set row heights for better readability
@@ -287,6 +281,176 @@ function createWeeklyReportWorkbook(weeklyReportData: any, locale: string): XLSX
       // Add worksheet to workbook with localized name
     const sheetName = t('weeklyReport');
     XLSX.utils.book_append_sheet(wb, ws, sheetName);
+    
+    return wb;
+}
+
+/**
+ * Function to calculate optimal column widths based on content
+ */
+function calculateOptimalColumnWidths(worksheetData: any[][]): { wch: number }[] {
+    if (!worksheetData || worksheetData.length === 0) return [];
+    
+    // Initialize column widths array
+    const maxColumns = Math.max(...worksheetData.map(row => row ? row.length : 0));
+    const columnWidths = new Array(maxColumns).fill(0);
+    
+    // Calculate the width needed for each column
+    worksheetData.forEach((row, rowIndex) => {
+        if (!row) return;
+        
+        row.forEach((cell, colIndex) => {
+            if (cell === null || cell === undefined) return;
+            
+            let cellText = String(cell);
+            
+            // Handle multi-line text (split by \n)
+            const lines = cellText.split('\n');
+            const maxLineLength = Math.max(...lines.map(line => line.length));
+            
+            // Apply different multipliers based on row type
+            let widthMultiplier = 1.2; // Base multiplier for character width
+            
+            if (rowIndex === 0) {
+                // Title row - allow more space
+                widthMultiplier = 1.4;
+            } else if (rowIndex === 2) {
+                // Header row - allow more space for headers
+                widthMultiplier = 1.3;
+            }
+            
+            // Calculate estimated width
+            let estimatedWidth = maxLineLength * widthMultiplier;
+            
+            // Apply minimum and maximum constraints
+            estimatedWidth = Math.max(estimatedWidth, 8); // Minimum width
+            estimatedWidth = Math.min(estimatedWidth, 50); // Maximum width to prevent extremely wide columns
+            
+            // Update column width if this cell needs more space
+            if (estimatedWidth > columnWidths[colIndex]) {
+                columnWidths[colIndex] = estimatedWidth;
+            }
+        });
+    });
+    
+    // Convert to XLSX format
+    return columnWidths.map(width => ({ wch: Math.ceil(width) }));
+}
+
+/**
+ * Function to create a generic workbook from tabular data
+ */
+function createGenericWorkbook(data: any[], title: string): XLSX.WorkBook {
+    if (!data || data.length === 0) {
+        // Create empty workbook with just a title
+        const wb = XLSX.utils.book_new();
+        const ws = XLSX.utils.aoa_to_sheet([[title], [t('noDataAvailable')]]);
+        ws['!cols'] = [{ wch: 30 }];
+        XLSX.utils.book_append_sheet(wb, ws, title);
+        return wb;
+    }
+
+    const wb = XLSX.utils.book_new();
+    
+    // Create worksheet data with proper formatting
+    const worksheetData: any[][] = [];
+    
+    // Title row
+    worksheetData.push([title.toUpperCase()]);
+    worksheetData.push([]); // Empty row
+    
+    // Header row - get keys from first object
+    const headers = Object.keys(data[0]);
+    worksheetData.push(headers);
+    
+    // Data rows
+    data.forEach((item: any) => {
+        const row = headers.map(header => {
+            const value = item[header];
+            if (value === null || value === undefined) return '';
+            if (typeof value === 'object') return JSON.stringify(value);
+            return String(value);
+        });
+        worksheetData.push(row);
+    });
+    
+    // Create worksheet
+    const ws = XLSX.utils.aoa_to_sheet(worksheetData);
+    
+    // Calculate optimal column widths based on content
+    const colWidths = calculateOptimalColumnWidths(worksheetData);
+    ws['!cols'] = colWidths;
+    
+    // Set row heights for better readability
+    const rowHeights = [];
+    rowHeights[0] = { hpt: 25 }; // Title row
+    rowHeights[2] = { hpt: 20 }; // Header row
+    for (let i = 3; i < worksheetData.length; i++) {
+        rowHeights[i] = { hpt: 18 }; // Data rows
+    }
+    ws['!rows'] = rowHeights;
+    
+    // Merge cells for title
+    ws['!merges'] = [
+        { s: { r: 0, c: 0 }, e: { r: 0, c: headers.length - 1 } }
+    ];
+    
+    // Add basic styling
+    // Title cell
+    const titleCell = XLSX.utils.encode_cell({ r: 0, c: 0 });
+    if (!ws[titleCell]) ws[titleCell] = { t: 's', v: '' };
+    ws[titleCell].s = {
+        font: { bold: true, sz: 14, name: 'Arial' },
+        alignment: { horizontal: 'center', vertical: 'center' },
+        fill: { fgColor: { rgb: 'E8F4FD' } },
+        border: {
+            top: { style: 'thin', color: { rgb: '000000' } },
+            bottom: { style: 'thin', color: { rgb: '000000' } },
+            left: { style: 'thin', color: { rgb: '000000' } },
+            right: { style: 'thin', color: { rgb: '000000' } }
+        }
+    };
+    
+    // Style header row
+    for (let c = 0; c < headers.length; c++) {
+        const headerCell = XLSX.utils.encode_cell({ r: 2, c });
+        if (!ws[headerCell]) continue;
+        ws[headerCell].s = {
+            font: { bold: true, sz: 11, name: 'Arial' },
+            alignment: { horizontal: 'center', vertical: 'center' },
+            fill: { fgColor: { rgb: 'D9E2F3' } },
+            border: {
+                top: { style: 'thin', color: { rgb: '000000' } },
+                bottom: { style: 'thin', color: { rgb: '000000' } },
+                left: { style: 'thin', color: { rgb: '000000' } },
+                right: { style: 'thin', color: { rgb: '000000' } }
+            }
+        };
+    }
+    
+    // Style data rows with alternating colors
+    for (let r = 3; r < worksheetData.length; r++) {
+        const isEvenRow = (r - 3) % 2 === 0;
+        for (let c = 0; c < headers.length; c++) {
+            const cellRef = XLSX.utils.encode_cell({ r, c });
+            if (!ws[cellRef]) continue;
+            
+            ws[cellRef].s = {
+                font: { sz: 10, name: 'Arial' },
+                alignment: { horizontal: 'left', vertical: 'center' },
+                fill: { fgColor: { rgb: isEvenRow ? 'FFFFFF' : 'F8F9FA' } },
+                border: {
+                    top: { style: 'thin', color: { rgb: 'CCCCCC' } },
+                    bottom: { style: 'thin', color: { rgb: 'CCCCCC' } },
+                    left: { style: 'thin', color: { rgb: 'CCCCCC' } },
+                    right: { style: 'thin', color: { rgb: 'CCCCCC' } }
+                }
+            };
+        }
+    }
+    
+    // Add worksheet to workbook
+    XLSX.utils.book_append_sheet(wb, ws, title);
     
     return wb;
 }
@@ -462,11 +626,10 @@ const Export: React.FC = () => {
             
             const fromDate = dayjs(startDate).format('YYYY-MM-DD');
             const toDate = dayjs(endDate).format('YYYY-MM-DD');
-            
-            // Format data for export
-            let exportData;
-            let mimeType;
-            let fileExtension;
+              // Format data for export
+            let exportData: string | ArrayBuffer;
+            let mimeType: string;
+            let fileExtension: string;
             
             switch (exportFormat) {
                 case 'csv':
@@ -482,15 +645,30 @@ const Export: React.FC = () => {
                     }, null, 2);
                     mimeType = 'application/json';
                     fileExtension = 'json'; 
+                    break;                case 'xlsx':
+                    const workbookXlsx = createGenericWorkbook(salesSummaryData, t('salesSummary'));
+                    exportData = XLSX.write(workbookXlsx, { bookType: 'xlsx', type: 'array' });
+                    mimeType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+                    fileExtension = 'xlsx';
                     break;
-                // Note: PDF and XLSX would need additional libraries
+                case 'ods':
+                    const workbookOds = createGenericWorkbook(salesSummaryData, t('salesSummary'));
+                    exportData = XLSX.write(workbookOds, { bookType: 'ods', type: 'array' });
+                    mimeType = 'application/vnd.oasis.opendocument.spreadsheet';
+                    fileExtension = 'ods';
+                    break;
                 default:
                     setExportStatus({ success: false, message: t("formatNotSupported") });
                     return;
-            }
-              // Generate filename with date range
+            }              // Generate filename with date range
             const filename = `${t('fileNames.salesSummary')}-${fromDate}-to-${toDate}.${fileExtension}`;
-            downloadFile(exportData, filename, mimeType);
+            
+            // Download file based on format
+            if (exportFormat === 'xlsx' || exportFormat === 'ods') {
+                downloadBinaryFile(exportData as ArrayBuffer, filename, mimeType);
+            } else {
+                downloadFile(exportData as string, filename, mimeType);
+            }
             
             setExportStatus({ success: true, message: t("exportSuccess") });
         } catch (error) {
@@ -510,10 +688,9 @@ const Export: React.FC = () => {
                 setExportStatus({ success: false, message: t("noOrdersToExport") });
                 return;
             }
-            
-            let exportData;
-            let mimeType;
-            let fileExtension;
+              let exportData: string | ArrayBuffer;
+            let mimeType: string;
+            let fileExtension: string;
             
             switch (exportFormat) {
                 case 'csv':
@@ -525,16 +702,31 @@ const Export: React.FC = () => {
                     exportData = JSON.stringify(orders, null, 2);
                     mimeType = 'application/json';
                     fileExtension = 'json';
+                    break;                case 'xlsx':
+                    const workbookXlsx = createGenericWorkbook(orders, t('allOrders'));
+                    exportData = XLSX.write(workbookXlsx, { bookType: 'xlsx', type: 'array' });
+                    mimeType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+                    fileExtension = 'xlsx';
                     break;
-                // Note: PDF and XLSX would need additional libraries
+                case 'ods':
+                    const workbookOds = createGenericWorkbook(orders, t('allOrders'));
+                    exportData = XLSX.write(workbookOds, { bookType: 'ods', type: 'array' });
+                    mimeType = 'application/vnd.oasis.opendocument.spreadsheet';
+                    fileExtension = 'ods';
+                    break;
                 default:
                     setExportStatus({ success: false, message: t("formatNotSupported") });
                     return;
-            }
-              // Generate filename with the current date
+            }              // Generate filename with the current date
             const currentDate = dayjs().format('YYYY-MM-DD');
             const filename = `${t('fileNames.allOrders')}-${currentDate}.${fileExtension}`;
-            downloadFile(exportData, filename, mimeType);
+            
+            // Download file based on format
+            if (exportFormat === 'xlsx' || exportFormat === 'ods') {
+                downloadBinaryFile(exportData as ArrayBuffer, filename, mimeType);
+            } else {
+                downloadFile(exportData as string, filename, mimeType);
+            }
             
             setExportStatus({ success: true, message: t("exportSuccess") });
         } catch (error) {
@@ -554,10 +746,9 @@ const Export: React.FC = () => {
                 setExportStatus({ success: false, message: t("noProductsToExport") });
                 return;
             }
-            
-            let exportData;
-            let mimeType;
-            let fileExtension;
+              let exportData: string | ArrayBuffer;
+            let mimeType: string;
+            let fileExtension: string;
             
             switch (exportFormat) {
                 case 'csv':
@@ -569,16 +760,31 @@ const Export: React.FC = () => {
                     exportData = JSON.stringify(products, null, 2);
                     mimeType = 'application/json';
                     fileExtension = 'json';
+                    break;                case 'xlsx':
+                    const workbookXlsx = createGenericWorkbook(products, t('productCatalog'));
+                    exportData = XLSX.write(workbookXlsx, { bookType: 'xlsx', type: 'array' });
+                    mimeType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+                    fileExtension = 'xlsx';
                     break;
-                // Note: PDF and XLSX would need additional libraries
+                case 'ods':
+                    const workbookOds = createGenericWorkbook(products, t('productCatalog'));
+                    exportData = XLSX.write(workbookOds, { bookType: 'ods', type: 'array' });
+                    mimeType = 'application/vnd.oasis.opendocument.spreadsheet';
+                    fileExtension = 'ods';
+                    break;
                 default:
                     setExportStatus({ success: false, message: t("formatNotSupported") });
                     return;
-            }
-              // Generate filename with the current date
+            }              // Generate filename with the current date
             const currentDate = dayjs().format('YYYY-MM-DD');
             const filename = `${t('fileNames.productCatalog')}-${currentDate}.${fileExtension}`;
-            downloadFile(exportData, filename, mimeType);
+            
+            // Download file based on format
+            if (exportFormat === 'xlsx' || exportFormat === 'ods') {
+                downloadBinaryFile(exportData as ArrayBuffer, filename, mimeType);
+            } else {
+                downloadFile(exportData as string, filename, mimeType);
+            }
             
             setExportStatus({ success: true, message: t("exportSuccess") });
         } catch (error) {
