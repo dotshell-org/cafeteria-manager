@@ -40,7 +40,8 @@
     "react-i18next": "^15.4.0",
     "react-router-dom": "^7.1.1",
     "recharts": "^2.15.1",
-    "tesseract.js": "^6.0.0"
+    "tesseract.js": "^6.0.0",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@electron/rebuild": "^4.0.1",
@@ -49,6 +50,7 @@
     "@types/react-dom": "^18.2.21",
     "@types/react-i18next": "^7.8.3",
     "@types/react-router-dom": "^5.3.3",
+    "@types/xlsx": "^0.0.35",
     "@typescript-eslint/eslint-plugin": "^7.0.0",
     "@typescript-eslint/parser": "^7.0.0",
     "@vitejs/plugin-react": "^4.2.1",
