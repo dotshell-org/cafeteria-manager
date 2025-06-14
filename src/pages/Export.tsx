@@ -133,15 +133,15 @@ function createWeeklyReportWorkbook(weeklyReportData: any, locale: string): XLSX
     
     // Header row - localized
     const productHeader = `${t('product')} (${t('price')})`;
-    const headerRow = [productHeader];
-    
-    // Add day headers (Monday to Sunday) using localized day names
+    const headerRow = [productHeader];    // Add day headers (Monday to Sunday) using localized day names
     const weekDays = weeklyReportData.weekDays || [];
     weekDays.forEach((day: string) => {
         // Use dayjs with the current locale to get localized day names
         const dayName = dayjs(day).locale(dayjsLocale).format('dddd');
+        // Capitalize first letter for all languages
+        const capitalizedDayName = dayName.charAt(0).toUpperCase() + dayName.slice(1);
         const dateStr = dayjs(day).locale(dayjsLocale).format('DD/MM');
-        headerRow.push(`${dayName}\n${dateStr}`);
+        headerRow.push(`${capitalizedDayName} ${dateStr}`);
     });
     
     const weeklyTotalText = t('weeklyTotal');
@@ -149,11 +149,12 @@ function createWeeklyReportWorkbook(weeklyReportData: any, locale: string): XLSX
     headerRow.push(weeklyTotalText);
     headerRow.push(`${revenueText} (€)`);
     worksheetData.push(headerRow);
-    
-    // Data rows
+      // Data rows
     let totalWeeklyRevenue = 0;
     weeklyReportData.products.forEach((product: any) => {
-        const row = [`${product.name}\n(${product.price.toFixed(2)}€)`];
+        // Capitalize first letter of product name
+        const capitalizedProductName = product.name.charAt(0).toUpperCase() + product.name.slice(1);
+        const row = [`${capitalizedProductName}\n(${product.price.toFixed(2)}€)`];
           // Add daily quantities
         let weekTotal = 0;
         weekDays.forEach((day: string) => {
