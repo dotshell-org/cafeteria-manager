@@ -185,55 +185,60 @@ function createWeeklyReportWorkbook(weeklyReportData: any, locale: string): XLSX
     // Calculate optimal column widths based on content
     const colWidths = calculateOptimalColumnWidths(worksheetData);
     ws['!cols'] = colWidths;
-    
-    // Set row heights for better readability
+      // Set enhanced row heights for better visual presentation
     const rowHeights = [];
-    rowHeights[0] = { hpt: 25 }; // Title row
-    rowHeights[2] = { hpt: 30 }; // Header row
+    rowHeights[0] = { hpt: 30 }; // Title row - taller for prominence
+    rowHeights[2] = { hpt: 28 }; // Header row - taller for better readability
     for (let i = 3; i < worksheetData.length - 2; i++) {
-        rowHeights[i] = { hpt: 25 }; // Data rows
+        rowHeights[i] = { hpt: 22 }; // Data rows - comfortable height
     }
-    rowHeights[worksheetData.length - 1] = { hpt: 25 }; // Total row
+    rowHeights[worksheetData.length - 1] = { hpt: 28 }; // Total row - emphasized height
     ws['!rows'] = rowHeights;
     
     // Merge cells for title
     ws['!merges'] = [
         { s: { r: 0, c: 0 }, e: { r: 0, c: headerRow.length - 1 } }
     ];
-    
-    // Add some basic styling information (this will work better in Excel than ODS)
+      // Add professional styling with enhanced visual appearance
     const titleCell = XLSX.utils.encode_cell({ r: 0, c: 0 });
     if (!ws[titleCell]) ws[titleCell] = { t: 's', v: '' };
     ws[titleCell].s = {
-        font: { bold: true, sz: 14, name: 'Arial' },
+        font: { bold: true, sz: 16, name: 'Calibri', color: { rgb: '1F4E79' } },
         alignment: { horizontal: 'center', vertical: 'center' },
-        fill: { fgColor: { rgb: 'E8F4FD' } },
+        fill: { fgColor: { rgb: 'DCE6F1' } },
         border: {
-            top: { style: 'thin', color: { rgb: '000000' } },
-            bottom: { style: 'thin', color: { rgb: '000000' } },
-            left: { style: 'thin', color: { rgb: '000000' } },
-            right: { style: 'thin', color: { rgb: '000000' } }
+            top: { style: 'medium', color: { rgb: '1F4E79' } },
+            bottom: { style: 'medium', color: { rgb: '1F4E79' } },
+            left: { style: 'medium', color: { rgb: '1F4E79' } },
+            right: { style: 'medium', color: { rgb: '1F4E79' } }
         }
     };
     
-    // Style header row
+    // Style header row with gradient-like professional appearance
     for (let c = 0; c < headerRow.length; c++) {
         const headerCell = XLSX.utils.encode_cell({ r: 2, c });
         if (!ws[headerCell]) continue;
+        
+        // Different header styling for different column types
+        let headerColor = '4472C4'; // Default blue
+        if (c === 0) headerColor = '4472C4'; // Product column - blue
+        else if (c >= headerRow.length - 2) headerColor = '70AD47'; // Total/Revenue columns - green
+        else headerColor = '5B9BD5'; // Daily columns - lighter blue
+        
         ws[headerCell].s = {
-            font: { bold: true, sz: 11, name: 'Arial' },
+            font: { bold: true, sz: 11, name: 'Calibri', color: { rgb: 'FFFFFF' } },
             alignment: { horizontal: 'center', vertical: 'center', wrapText: true },
-            fill: { fgColor: { rgb: 'D9E2F3' } },
+            fill: { fgColor: { rgb: headerColor } },
             border: {
-                top: { style: 'thin', color: { rgb: '000000' } },
-                bottom: { style: 'thin', color: { rgb: '000000' } },
-                left: { style: 'thin', color: { rgb: '000000' } },
-                right: { style: 'thin', color: { rgb: '000000' } }
+                top: { style: 'medium', color: { rgb: '2F5597' } },
+                bottom: { style: 'medium', color: { rgb: '2F5597' } },
+                left: { style: 'thin', color: { rgb: '2F5597' } },
+                right: { style: 'thin', color: { rgb: '2F5597' } }
             }
         };
     }
     
-    // Style data rows with borders and alternating colors
+    // Style data rows with professional alternating colors and better formatting
     const dataStartRow = 3;
     const dataEndRow = worksheetData.length - 3; // Exclude empty row and total row
     
@@ -243,39 +248,88 @@ function createWeeklyReportWorkbook(weeklyReportData: any, locale: string): XLSX
             const cellRef = XLSX.utils.encode_cell({ r, c });
             if (!ws[cellRef]) continue;
             
+            // Enhanced color scheme for data rows
+            let fillColor = isEvenRow ? 'FFFFFF' : 'F2F2F2';
+            
+            // Special formatting for monetary columns
+            let numFmt = '';
+            if (c >= headerRow.length - 2) {
+                numFmt = c === headerRow.length - 1 ? '#,##0.00€' : '#,##0'; // Revenue column gets euro symbol
+                fillColor = isEvenRow ? 'F7FBF7' : 'E8F5E8'; // Light green tint for financial data
+            }
+            
             ws[cellRef].s = {
-                font: { sz: 10, name: 'Arial' },
+                font: { 
+                    sz: c === 0 ? 11 : 10, 
+                    name: 'Calibri',
+                    bold: c === 0 ? true : false, // Bold product names
+                    color: { rgb: c === 0 ? '1F4E79' : '000000' }
+                },
                 alignment: { 
                     horizontal: c === 0 ? 'left' : (c >= headerRow.length - 2 ? 'right' : 'center'),
                     vertical: 'center',
-                    wrapText: c === 0 // Wrap text for product names
+                    wrapText: c === 0,
+                    indent: c === 0 ? 1 : 0 // Slight indentation for product names
                 },
-                fill: { fgColor: { rgb: isEvenRow ? 'FFFFFF' : 'F8F9FA' } },
+                fill: { fgColor: { rgb: fillColor } },
                 border: {
-                    top: { style: 'thin', color: { rgb: 'CCCCCC' } },
-                    bottom: { style: 'thin', color: { rgb: 'CCCCCC' } },
-                    left: { style: 'thin', color: { rgb: 'CCCCCC' } },
-                    right: { style: 'thin', color: { rgb: 'CCCCCC' } }
-                }
+                    top: { style: 'thin', color: { rgb: 'BFBFBF' } },
+                    bottom: { style: 'thin', color: { rgb: 'BFBFBF' } },
+                    left: { style: 'thin', color: { rgb: 'BFBFBF' } },
+                    right: { style: 'thin', color: { rgb: 'BFBFBF' } }
+                },
+                numFmt: numFmt
             };
         }
     }
     
-    // Style total row
+    // Style total row with enhanced professional appearance
     const totalRowIndex = worksheetData.length - 1;
     for (let c = 0; c < headerRow.length; c++) {
         const totalCell = XLSX.utils.encode_cell({ r: totalRowIndex, c });
         if (!ws[totalCell]) continue;
+        
+        // Special styling for the total row
+        let cellAlignment = 'center';
+        let cellColor = 'FFC000'; // Gold/orange color for totals
+        let fontColor = '000000';
+        let numFmt = '';
+        
+        if (c === headerRow.length - 2) {
+            // Total quantity column
+            cellAlignment = 'right';
+            cellColor = 'FFE699';
+        } else if (c === headerRow.length - 1) {
+            // Total revenue column
+            cellAlignment = 'right';
+            cellColor = 'FFD966';
+            numFmt = '#,##0.00€';
+            fontColor = '7F6000'; // Darker color for revenue
+        } else if (c < headerRow.length - 2 && c > 0) {
+            // Empty cells in total row
+            cellColor = 'FFF2CC';
+        }
+        
         ws[totalCell].s = {
-            font: { bold: true, sz: 12, name: 'Arial' },
-            alignment: { horizontal: c === 0 ? 'left' : 'right', vertical: 'center' },
-            fill: { fgColor: { rgb: 'FFE6CC' } },
+            font: { 
+                bold: true, 
+                sz: 12, 
+                name: 'Calibri',
+                color: { rgb: fontColor }
+            },
+            alignment: { 
+                horizontal: cellAlignment, 
+                vertical: 'center',
+                indent: c === headerRow.length - 2 || c === headerRow.length - 1 ? 1 : 0
+            },
+            fill: { fgColor: { rgb: cellColor } },
             border: {
-                top: { style: 'thick', color: { rgb: '000000' } },
-                bottom: { style: 'thick', color: { rgb: '000000' } },
-                left: { style: 'thick', color: { rgb: '000000' } },
-                right: { style: 'thick', color: { rgb: '000000' } }
-            }
+                top: { style: 'double', color: { rgb: '7F6000' } },
+                bottom: { style: 'double', color: { rgb: '7F6000' } },
+                left: { style: 'medium', color: { rgb: '7F6000' } },
+                right: { style: 'medium', color: { rgb: '7F6000' } }
+            },
+            numFmt: numFmt
         };
     }
       // Add worksheet to workbook with localized name
@@ -307,24 +361,51 @@ function calculateOptimalColumnWidths(worksheetData: any[][]): { wch: number }[]
             // Handle multi-line text (split by \n)
             const lines = cellText.split('\n');
             const maxLineLength = Math.max(...lines.map(line => line.length));
-            
-            // Apply different multipliers based on row type
+              // Apply different multipliers based on row type and content
             let widthMultiplier = 1.2; // Base multiplier for character width
             
             if (rowIndex === 0) {
-                // Title row - allow more space
-                widthMultiplier = 1.4;
+                // Title row - allow more space for prominence
+                widthMultiplier = 1.6;
             } else if (rowIndex === 2) {
-                // Header row - allow more space for headers
-                widthMultiplier = 1.3;
+                // Header row - allow extra space for better readability
+                widthMultiplier = 1.4;
+            } else {
+                // Data rows - check content type for smart sizing
+                if (typeof cell === 'number' || /^\d+([.,]\d+)?[€%]?$/.test(cellText)) {
+                    // Numeric data - less space needed
+                    widthMultiplier = 1.0;
+                } else if (cellText.includes('\n')) {
+                    // Multi-line text - increase width slightly
+                    widthMultiplier = 1.3;
+                }
             }
             
-            // Calculate estimated width
+            // Calculate estimated width with smart content analysis
             let estimatedWidth = maxLineLength * widthMultiplier;
             
-            // Apply minimum and maximum constraints
-            estimatedWidth = Math.max(estimatedWidth, 8); // Minimum width
-            estimatedWidth = Math.min(estimatedWidth, 50); // Maximum width to prevent extremely wide columns
+            // Smart minimum widths based on content type
+            let minWidth = 8;
+            if (rowIndex === 2) { // Header row
+                minWidth = 12; // Headers need more minimum space
+            } else if (cellText.includes('€') || cellText.includes('EUR')) {
+                minWidth = 10; // Currency needs adequate space
+            } else if (cellText.match(/^\d{4}-\d{2}-\d{2}/)) {
+                minWidth = 12; // Dates need consistent width
+            }
+            
+            // Apply constraints with content-aware maximum
+            estimatedWidth = Math.max(estimatedWidth, minWidth);
+            
+            // Dynamic maximum based on content type
+            let maxWidth = 50;
+            if (colIndex === 0) {
+                maxWidth = 35; // Product names don't need excessive width
+            } else if (cellText.match(/^\d+([.,]\d+)?[€%]?$/)) {
+                maxWidth = 15; // Numbers don't need much width
+            }
+            
+            estimatedWidth = Math.min(estimatedWidth, maxWidth);
             
             // Update column width if this cell needs more space
             if (estimatedWidth > columnWidths[colIndex]) {
@@ -380,13 +461,12 @@ function createGenericWorkbook(data: any[], title: string): XLSX.WorkBook {
     // Calculate optimal column widths based on content
     const colWidths = calculateOptimalColumnWidths(worksheetData);
     ws['!cols'] = colWidths;
-    
-    // Set row heights for better readability
+      // Set enhanced row heights for professional appearance
     const rowHeights = [];
-    rowHeights[0] = { hpt: 25 }; // Title row
-    rowHeights[2] = { hpt: 20 }; // Header row
+    rowHeights[0] = { hpt: 30 }; // Title row - prominent height
+    rowHeights[2] = { hpt: 25 }; // Header row - comfortable height
     for (let i = 3; i < worksheetData.length; i++) {
-        rowHeights[i] = { hpt: 18 }; // Data rows
+        rowHeights[i] = { hpt: 20 }; // Data rows - neat and compact
     }
     ws['!rows'] = rowHeights;
     
@@ -394,57 +474,103 @@ function createGenericWorkbook(data: any[], title: string): XLSX.WorkBook {
     ws['!merges'] = [
         { s: { r: 0, c: 0 }, e: { r: 0, c: headers.length - 1 } }
     ];
-    
-    // Add basic styling
-    // Title cell
+      // Add enhanced professional styling
+    // Title cell with premium appearance
     const titleCell = XLSX.utils.encode_cell({ r: 0, c: 0 });
     if (!ws[titleCell]) ws[titleCell] = { t: 's', v: '' };
     ws[titleCell].s = {
-        font: { bold: true, sz: 14, name: 'Arial' },
+        font: { bold: true, sz: 16, name: 'Calibri', color: { rgb: '1F4E79' } },
         alignment: { horizontal: 'center', vertical: 'center' },
-        fill: { fgColor: { rgb: 'E8F4FD' } },
+        fill: { fgColor: { rgb: 'DCE6F1' } },
         border: {
-            top: { style: 'thin', color: { rgb: '000000' } },
-            bottom: { style: 'thin', color: { rgb: '000000' } },
-            left: { style: 'thin', color: { rgb: '000000' } },
-            right: { style: 'thin', color: { rgb: '000000' } }
+            top: { style: 'medium', color: { rgb: '1F4E79' } },
+            bottom: { style: 'medium', color: { rgb: '1F4E79' } },
+            left: { style: 'medium', color: { rgb: '1F4E79' } },
+            right: { style: 'medium', color: { rgb: '1F4E79' } }
         }
     };
     
-    // Style header row
+    // Style header row with professional gradient
     for (let c = 0; c < headers.length; c++) {
         const headerCell = XLSX.utils.encode_cell({ r: 2, c });
         if (!ws[headerCell]) continue;
+        
+        // Determine header color based on content type
+        let headerColor = '4472C4'; // Default professional blue
+        const headerText = headers[c].toLowerCase();
+        
+        if (headerText.includes('revenue') || headerText.includes('price') || headerText.includes('total')) {
+            headerColor = '70AD47'; // Green for financial data
+        } else if (headerText.includes('date') || headerText.includes('time')) {
+            headerColor = 'C55A11'; // Orange for dates
+        } else if (headerText.includes('quantity') || headerText.includes('qty')) {
+            headerColor = '7030A0'; // Purple for quantities
+        }
+        
         ws[headerCell].s = {
-            font: { bold: true, sz: 11, name: 'Arial' },
-            alignment: { horizontal: 'center', vertical: 'center' },
-            fill: { fgColor: { rgb: 'D9E2F3' } },
+            font: { bold: true, sz: 11, name: 'Calibri', color: { rgb: 'FFFFFF' } },
+            alignment: { horizontal: 'center', vertical: 'center', wrapText: true },
+            fill: { fgColor: { rgb: headerColor } },
             border: {
-                top: { style: 'thin', color: { rgb: '000000' } },
-                bottom: { style: 'thin', color: { rgb: '000000' } },
-                left: { style: 'thin', color: { rgb: '000000' } },
-                right: { style: 'thin', color: { rgb: '000000' } }
+                top: { style: 'medium', color: { rgb: '2F5597' } },
+                bottom: { style: 'medium', color: { rgb: '2F5597' } },
+                left: { style: 'thin', color: { rgb: '2F5597' } },
+                right: { style: 'thin', color: { rgb: '2F5597' } }
             }
         };
     }
     
-    // Style data rows with alternating colors
+    // Style data rows with professional alternating colors and smart formatting
     for (let r = 3; r < worksheetData.length; r++) {
         const isEvenRow = (r - 3) % 2 === 0;
         for (let c = 0; c < headers.length; c++) {
             const cellRef = XLSX.utils.encode_cell({ r, c });
             if (!ws[cellRef]) continue;
             
+            const headerText = headers[c].toLowerCase();
+            let fillColor = isEvenRow ? 'FFFFFF' : 'F2F2F2';
+            let numFmt = '';
+            let fontColor = '000000';
+            let alignment = 'left';
+            
+            // Smart formatting based on column content
+            if (headerText.includes('revenue') || headerText.includes('price')) {
+                numFmt = '#,##0.00€';
+                fillColor = isEvenRow ? 'F7FBF7' : 'E8F5E8'; // Light green for money
+                alignment = 'right';
+                fontColor = '0F5132';
+            } else if (headerText.includes('quantity') || headerText.includes('qty')) {
+                numFmt = '#,##0';
+                alignment = 'center';
+                fillColor = isEvenRow ? 'FFF8E7' : 'FFF0D1'; // Light yellow for quantities
+            } else if (headerText.includes('date')) {
+                numFmt = 'dd/mm/yyyy';
+                alignment = 'center';
+                fillColor = isEvenRow ? 'F0F8FF' : 'E6F3FF'; // Light blue for dates
+            } else if (headerText.includes('id')) {
+                alignment = 'center';
+                fontColor = '6C757D';
+            }
+            
             ws[cellRef].s = {
-                font: { sz: 10, name: 'Arial' },
-                alignment: { horizontal: 'left', vertical: 'center' },
-                fill: { fgColor: { rgb: isEvenRow ? 'FFFFFF' : 'F8F9FA' } },
+                font: { 
+                    sz: 10, 
+                    name: 'Calibri',
+                    color: { rgb: fontColor }
+                },
+                alignment: { 
+                    horizontal: alignment, 
+                    vertical: 'center',
+                    indent: alignment === 'left' ? 1 : 0
+                },
+                fill: { fgColor: { rgb: fillColor } },
                 border: {
-                    top: { style: 'thin', color: { rgb: 'CCCCCC' } },
-                    bottom: { style: 'thin', color: { rgb: 'CCCCCC' } },
-                    left: { style: 'thin', color: { rgb: 'CCCCCC' } },
-                    right: { style: 'thin', color: { rgb: 'CCCCCC' } }
-                }
+                    top: { style: 'thin', color: { rgb: 'BFBFBF' } },
+                    bottom: { style: 'thin', color: { rgb: 'BFBFBF' } },
+                    left: { style: 'thin', color: { rgb: 'BFBFBF' } },
+                    right: { style: 'thin', color: { rgb: 'BFBFBF' } }
+                },
+                numFmt: numFmt
             };
         }
     }
