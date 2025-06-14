@@ -75,9 +75,15 @@
   "formatNotSupported": "Exportformaat niet ondersteund",
   "noOrdersToExport": "Geen bestellingen om te exporteren",
   "noProductsToExport": "Geen producten om te exporteren",
-  "noSalesData": "Geen verkoopgegevens voor deze periode",
-  "selectDateRange": "Selecteer een datumbereik en klik op 'Gegevens laden'",
+  "noSalesData": "Geen verkoopgegevens voor deze periode",  "selectDateRange": "Selecteer een datumbereik en klik op 'Gegevens laden'",
   "weeklyTotal": "Wekelijks totaal",
+
+  "fileNames": {
+    "weeklyReport": "weekrapport",
+    "salesSummary": "verkoopavatting",
+    "allOrders": "alle-bestellingen",
+    "productCatalog": "productcatalogus"
+  },
 
   "settings": "Instellingen",
   "language": "Taal",

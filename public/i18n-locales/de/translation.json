@@ -75,9 +75,15 @@
   "formatNotSupported": "Exportformat nicht unterstützt",
   "noOrdersToExport": "Keine Bestellungen zum Exportieren",
   "noProductsToExport": "Keine Produkte zum Exportieren",
-  "noSalesData": "Keine Verkaufsdaten für diesen Zeitraum",
-  "selectDateRange": "Wählen Sie einen Datumsbereich und klicken Sie auf 'Daten laden'",
+  "noSalesData": "Keine Verkaufsdaten für diesen Zeitraum",  "selectDateRange": "Wählen Sie einen Datumsbereich und klicken Sie auf 'Daten laden'",
   "weeklyTotal": "Wochensumme",
+
+  "fileNames": {
+    "weeklyReport": "wochenbericht",
+    "salesSummary": "verkaufszusammenfassung",
+    "allOrders": "alle-bestellungen",
+    "productCatalog": "produktkatalog"
+  },
 
   "settings": "Einstellungen",
   "language": "Sprache",

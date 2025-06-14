@@ -75,9 +75,15 @@
   "formatNotSupported": "不支持的导出格式",
   "noOrdersToExport": "没有订单可导出",
   "noProductsToExport": "没有产品可导出",
-  "noSalesData": "此期间没有销售数据",
-  "selectDateRange": "选择日期范围并点击'加载数据'",
+  "noSalesData": "此期间没有销售数据",  "selectDateRange": "选择日期范围并点击'加载数据'",
   "weeklyTotal": "周总计",
+
+  "fileNames": {
+    "weeklyReport": "周报告",
+    "salesSummary": "销售摘要",
+    "allOrders": "所有订单",
+    "productCatalog": "产品目录"
+  },
 
   "settings": "设置",
   "language": "语言",

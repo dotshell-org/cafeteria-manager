@@ -75,9 +75,15 @@
   "formatNotSupported": "Export format not supported",
   "noOrdersToExport": "No orders to export",
   "noProductsToExport": "No products to export",
-  "noSalesData": "No sales data for this period",
-  "selectDateRange": "Select a date range and click 'Load Data'",
+  "noSalesData": "No sales data for this period",  "selectDateRange": "Select a date range and click 'Load Data'",
   "weeklyTotal": "Weekly Total",
+
+  "fileNames": {
+    "weeklyReport": "weekly-report",
+    "salesSummary": "sales-summary",
+    "allOrders": "all-orders",
+    "productCatalog": "product-catalog"
+  },
 
   "settings": "Settings",
   "language": "Language",

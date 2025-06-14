@@ -75,9 +75,15 @@
   "formatNotSupported": "Formato di esportazione non supportato",
   "noOrdersToExport": "Nessun ordine da esportare",
   "noProductsToExport": "Nessun prodotto da esportare",
-  "noSalesData": "Nessun dato di vendita per questo periodo",
-  "selectDateRange": "Seleziona un intervallo di date e clicca su 'Carica dati'",
+  "noSalesData": "Nessun dato di vendita per questo periodo",  "selectDateRange": "Seleziona un intervallo di date e clicca su 'Carica dati'",
   "weeklyTotal": "Totale settimanale",
+
+  "fileNames": {
+    "weeklyReport": "rapporto-settimanale",
+    "salesSummary": "riepilogo-vendite",
+    "allOrders": "tutti-gli-ordini",
+    "productCatalog": "catalogo-prodotti"
+  },
 
   "settings": "Impostazioni",
   "language": "Lingua",

@@ -75,9 +75,15 @@
   "formatNotSupported": "エクスポート形式がサポートされていません",
   "noOrdersToExport": "エクスポートする注文がありません",
   "noProductsToExport": "エクスポートする製品がありません",
-  "noSalesData": "この期間の売上データがありません",
-  "selectDateRange": "日付範囲を選択し、「データを読み込む」をクリックしてください",
+  "noSalesData": "この期間の売上データがありません",  "selectDateRange": "日付範囲を選択し、「データを読み込む」をクリックしてください",
   "weeklyTotal": "週間合計",
+
+  "fileNames": {
+    "weeklyReport": "週次レポート",
+    "salesSummary": "売上サマリー",
+    "allOrders": "全注文",
+    "productCatalog": "商品カタログ"
+  },
 
   "settings": "設定",
   "language": "言語",

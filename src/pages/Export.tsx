@@ -4,11 +4,37 @@ import { t } from "i18next";
 import { useTranslation } from "react-i18next";
 import dayjs from "dayjs";
 import 'dayjs/locale/fr';
+import 'dayjs/locale/en';
+import 'dayjs/locale/es';
+import 'dayjs/locale/de';
+import 'dayjs/locale/it';
+import 'dayjs/locale/pt';
+import 'dayjs/locale/nl';
+import 'dayjs/locale/ja';
+import 'dayjs/locale/zh';
+import 'dayjs/locale/ar';
 import isoWeek from 'dayjs/plugin/isoWeek';
 import * as XLSX from 'xlsx';
 
 // Extend dayjs with isoWeek plugin
 dayjs.extend(isoWeek);
+
+// Map i18next language codes to dayjs locale codes
+function mapI18nToDatejsLocale(i18nLang: string): string {
+    const localeMap: Record<string, string> = {
+        'en': 'en',
+        'fr': 'fr',
+        'es': 'es',
+        'de': 'de',
+        'it': 'it',
+        'pt': 'pt',
+        'nl': 'nl',
+        'ja': 'ja',
+        'zh': 'zh',
+        'ar': 'ar'
+    };
+    return localeMap[i18nLang] || 'en'; // Default to English if not found
+}
 
 // Define export formats
 type ExportFormat = "csv" | "json" | "pdf" | "xlsx" | "ods";
@@ -91,30 +117,37 @@ function downloadBinaryFile(data: ArrayBuffer, filename: string, mimeType: strin
 function createWeeklyReportWorkbook(weeklyReportData: any, locale: string): XLSX.WorkBook {
     const wb = XLSX.utils.book_new();
     
+    // Map i18n locale to dayjs locale
+    const dayjsLocale = mapI18nToDatejsLocale(locale);
+    
     // Create worksheet data with proper formatting
     const worksheetData: any[][] = [];
     
-    // Title row
-    const startDate = dayjs(weeklyReportData.startDate).locale(locale).format('DD/MM/YYYY');
-    const endDate = dayjs(weeklyReportData.endDate).locale(locale).format('DD/MM/YYYY');
-    worksheetData.push([`RAPPORT HEBDOMADAIRE - ${startDate} au ${endDate}`]);
+    // Title row - localized
+    const startDate = dayjs(weeklyReportData.startDate).locale(dayjsLocale).format('DD/MM/YYYY');
+    const endDate = dayjs(weeklyReportData.endDate).locale(dayjsLocale).format('DD/MM/YYYY');
+    const weeklyReportTitle = t('weeklyReport').toUpperCase();
+    const toText = t('to');
+    worksheetData.push([`${weeklyReportTitle} - ${startDate} ${toText} ${endDate}`]);
     worksheetData.push([]); // Empty row
     
-    // Header row
-    const headerRow = ['Produit (Prix unitaire)'];
+    // Header row - localized
+    const productHeader = `${t('product')} (${t('price')})`;
+    const headerRow = [productHeader];
     
-    // Add day headers (Monday to Sunday)
+    // Add day headers (Monday to Sunday) using localized day names
     const weekDays = weeklyReportData.weekDays || [];
-    const dayNames = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
-      weekDays.forEach((day: string) => {
-        const dayOfWeek = dayjs(day).day();
-        const dayName = dayNames[dayOfWeek === 0 ? 6 : dayOfWeek - 1]; // Convert Sunday (0) to be last
-        const dateStr = dayjs(day).format('DD/MM');
+    weekDays.forEach((day: string) => {
+        // Use dayjs with the current locale to get localized day names
+        const dayName = dayjs(day).locale(dayjsLocale).format('dddd');
+        const dateStr = dayjs(day).locale(dayjsLocale).format('DD/MM');
         headerRow.push(`${dayName}\n${dateStr}`);
     });
     
-    headerRow.push('Total Semaine');
-    headerRow.push('Recette Semaine (€)');
+    const weeklyTotalText = t('weeklyTotal');
+    const revenueText = t('revenue');
+    headerRow.push(weeklyTotalText);
+    headerRow.push(`${revenueText} (€)`);
     worksheetData.push(headerRow);
     
     // Data rows
@@ -135,14 +168,14 @@ function createWeeklyReportWorkbook(weeklyReportData: any, locale: string): XLSX
         
         totalWeeklyRevenue += product.totalRevenue;
         worksheetData.push(row);
-    });
-      // Total row
+    });      // Total row - localized
     worksheetData.push([]); // Empty row
     const totalRow = [''];
     for (let i = 1; i < headerRow.length - 2; i++) {
         totalRow.push('');
     }
-    totalRow.push('TOTAL GÉNÉRAL');
+    const grandTotalText = t('grandTotal').toUpperCase();
+    totalRow.push(grandTotalText);
     totalRow.push(totalWeeklyRevenue.toFixed(2));
     worksheetData.push(totalRow);
     
@@ -250,9 +283,9 @@ function createWeeklyReportWorkbook(weeklyReportData: any, locale: string): XLSX
             }
         };
     }
-    
-    // Add worksheet to workbook
-    XLSX.utils.book_append_sheet(wb, ws, 'Rapport Hebdomadaire');
+      // Add worksheet to workbook with localized name
+    const sheetName = t('weeklyReport');
+    XLSX.utils.book_append_sheet(wb, ws, sheetName);
     
     return wb;
 }
@@ -323,10 +356,10 @@ const Export: React.FC = () => {
             await loadWeeklySalesReport();
             return; // If loading failed
         }
-        
-        try {
+          try {
             const locale = i18n.language;
-            const formattedDate = dayjs(weekStartDate).locale(locale).format('YYYY-MM-DD');
+            const dayjsLocale = mapI18nToDatejsLocale(locale);
+            const formattedDate = dayjs(weekStartDate).locale(dayjsLocale).format('YYYY-MM-DD');
             
             // Format weekly data for export
             let exportData: string | ArrayBuffer;
@@ -343,13 +376,12 @@ const Export: React.FC = () => {
                             totalQuantity: product.totalQuantity, 
                             totalRevenue: product.totalRevenue,
                         };
-                        
-                        // Add daily sales data
+                          // Add daily sales data
                         weeklyReportData.weekDays.forEach((day: string) => {
                             // For each day add quantity and revenue columns
                             const daySales = product.dailySales[day] || { quantity: 0, revenue: 0 };
-                            // Use a short day name (e.g., Mon, Tue)
-                            const dayLabel = dayjs(day).locale(locale).format('ddd');
+                            // Use a short day name (e.g., Mon, Tue) with correct locale
+                            const dayLabel = dayjs(day).locale(dayjsLocale).format('ddd');
                             // @ts-ignore
                             row[`${dayLabel}_qty`] = daySales.quantity;
                             // @ts-ignore  
@@ -394,9 +426,8 @@ const Export: React.FC = () => {
                     setExportStatus({ success: false, message: t("formatNotSupported") });
                     return;
             }
-            
-            // Generate filename with date
-            const filename = `rapport-hebdomadaire-${formattedDate}.${fileExtension}`;
+              // Generate filename with date
+            const filename = `${t('fileNames.weeklyReport')}-${formattedDate}.${fileExtension}`;
             
             // Download file based on format
             if (exportFormat === 'xlsx' || exportFormat === 'ods') {
@@ -456,9 +487,8 @@ const Export: React.FC = () => {
                     setExportStatus({ success: false, message: t("formatNotSupported") });
                     return;
             }
-            
-            // Generate filename with date range
-            const filename = `sales-summary-${fromDate}-to-${toDate}.${fileExtension}`;
+              // Generate filename with date range
+            const filename = `${t('fileNames.salesSummary')}-${fromDate}-to-${toDate}.${fileExtension}`;
             downloadFile(exportData, filename, mimeType);
             
             setExportStatus({ success: true, message: t("exportSuccess") });
@@ -500,10 +530,9 @@ const Export: React.FC = () => {
                     setExportStatus({ success: false, message: t("formatNotSupported") });
                     return;
             }
-            
-            // Generate filename with the current date
+              // Generate filename with the current date
             const currentDate = dayjs().format('YYYY-MM-DD');
-            const filename = `all-orders-${currentDate}.${fileExtension}`;
+            const filename = `${t('fileNames.allOrders')}-${currentDate}.${fileExtension}`;
             downloadFile(exportData, filename, mimeType);
             
             setExportStatus({ success: true, message: t("exportSuccess") });
@@ -545,10 +574,9 @@ const Export: React.FC = () => {
                     setExportStatus({ success: false, message: t("formatNotSupported") });
                     return;
             }
-            
-            // Generate filename with the current date
+              // Generate filename with the current date
             const currentDate = dayjs().format('YYYY-MM-DD');
-            const filename = `product-catalog-${currentDate}.${fileExtension}`;
+            const filename = `${t('fileNames.productCatalog')}-${currentDate}.${fileExtension}`;
             downloadFile(exportData, filename, mimeType);
             
             setExportStatus({ success: true, message: t("exportSuccess") });

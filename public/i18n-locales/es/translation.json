@@ -75,9 +75,15 @@
   "formatNotSupported": "Formato de exportación no compatible",
   "noOrdersToExport": "No hay pedidos para exportar",
   "noProductsToExport": "No hay productos para exportar",
-  "noSalesData": "No hay datos de ventas para este período",
-  "selectDateRange": "Seleccione un rango de fechas y haga clic en 'Cargar datos'",
+  "noSalesData": "No hay datos de ventas para este período",  "selectDateRange": "Seleccione un rango de fechas y haga clic en 'Cargar datos'",
   "weeklyTotal": "Total semanal",
+
+  "fileNames": {
+    "weeklyReport": "informe-semanal",
+    "salesSummary": "resumen-de-ventas",
+    "allOrders": "todos-los-pedidos",
+    "productCatalog": "catalogo-de-productos"
+  },
 
   "settings": "Configuración",
   "language": "Idioma",

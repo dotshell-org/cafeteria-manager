@@ -75,9 +75,15 @@
   "formatNotSupported": "تنسيق التصدير غير مدعوم",
   "noOrdersToExport": "لا توجد طلبات للتصدير",
   "noProductsToExport": "لا توجد منتجات للتصدير",
-  "noSalesData": "لا توجد بيانات مبيعات لهذه الفترة",
-  "selectDateRange": "اختر نطاق تاريخ وانقر على 'تحميل البيانات'",
+  "noSalesData": "لا توجد بيانات مبيعات لهذه الفترة",  "selectDateRange": "اختر نطاق تاريخ وانقر على 'تحميل البيانات'",
   "weeklyTotal": "المجموع الأسبوعي",
+
+  "fileNames": {
+    "weeklyReport": "التقرير-الأسبوعي",
+    "salesSummary": "ملخص-المبيعات",
+    "allOrders": "جميع-الطلبات",
+    "productCatalog": "كتالوج-المنتجات"
+  },
 
   "settings": "الإعدادات",
   "language": "اللغة",
