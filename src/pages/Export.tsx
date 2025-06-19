@@ -14,7 +14,6 @@ import 'dayjs/locale/ja';
 import 'dayjs/locale/zh';
 import 'dayjs/locale/ar';
 import isoWeek from 'dayjs/plugin/isoWeek';
-import * as XLSX from 'xlsx';
 
 // Extend dayjs with isoWeek plugin
 dayjs.extend(isoWeek);
@@ -37,7 +36,7 @@ function mapI18nToDatejsLocale(i18nLang: string): string {
 }
 
 // Define export formats
-type ExportFormat = "csv" | "json" | "pdf" | "xlsx" | "ods";
+type ExportFormat = "csv" | "json" | "pdf";
 
 // Animation variants
 const variants = {
@@ -97,494 +96,13 @@ function downloadFile(data: string, filename: string, mimeType: string): void {
 }
 
 /**
- * Function to download binary data as a file (for Excel/ODS files)
+ * Function to export weekly report
  */
-function downloadBinaryFile(data: ArrayBuffer, filename: string, mimeType: string): void {
-    const blob = new Blob([data], { type: mimeType });
-    const url = window.URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = filename;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    window.URL.revokeObjectURL(url);
-}
-
-/**
- * Function to create a formatted Excel/ODS workbook for weekly report
- */
-function createWeeklyReportWorkbook(weeklyReportData: any, locale: string): XLSX.WorkBook {
-    const wb = XLSX.utils.book_new();
-    
-    // Map i18n locale to dayjs locale
-    const dayjsLocale = mapI18nToDatejsLocale(locale);
-    
-    // Create worksheet data with proper formatting
-    const worksheetData: any[][] = [];
-    
-    // Title row - localized
-    const startDate = dayjs(weeklyReportData.startDate).locale(dayjsLocale).format('DD/MM/YYYY');
-    const endDate = dayjs(weeklyReportData.endDate).locale(dayjsLocale).format('DD/MM/YYYY');
-    const weeklyReportTitle = t('weeklyReport').toUpperCase();
-    const toText = t('to');
-    worksheetData.push([`${weeklyReportTitle} - ${startDate} ${toText} ${endDate}`]);
-    worksheetData.push([]); // Empty row
-    
-    // Header row - localized
-    const productHeader = `${t('product')} (${t('price')})`;
-    const headerRow = [productHeader];    // Add day headers (Monday to Sunday) using localized day names
-    const weekDays = weeklyReportData.weekDays || [];
-    weekDays.forEach((day: string) => {
-        // Use dayjs with the current locale to get localized day names
-        const dayName = dayjs(day).locale(dayjsLocale).format('dddd');
-        // Capitalize first letter for all languages
-        const capitalizedDayName = dayName.charAt(0).toUpperCase() + dayName.slice(1);
-        const dateStr = dayjs(day).locale(dayjsLocale).format('DD/MM');
-        headerRow.push(`${capitalizedDayName} ${dateStr}`);
-    });
-    
-    const weeklyTotalText = t('weeklyTotal');
-    const revenueText = t('revenue');
-    headerRow.push(weeklyTotalText);
-    headerRow.push(`${revenueText} (€)`);
-    worksheetData.push(headerRow);
-      // Data rows
-    let totalWeeklyRevenue = 0;
-    weeklyReportData.products.forEach((product: any) => {
-        // Capitalize first letter of product name
-        const capitalizedProductName = product.name.charAt(0).toUpperCase() + product.name.slice(1);
-        const row = [`${capitalizedProductName}\n(${product.price.toFixed(2)}€)`];
-          // Add daily quantities
-        let weekTotal = 0;
-        weekDays.forEach((day: string) => {
-            const daySales = product.dailySales[day] || { quantity: 0 };
-            row.push(daySales.quantity.toString());
-            weekTotal += daySales.quantity;
-        });
-        
-        // Add total quantity and revenue
-        row.push(weekTotal.toString());
-        row.push(product.totalRevenue.toFixed(2));
-        
-        totalWeeklyRevenue += product.totalRevenue;
-        worksheetData.push(row);
-    });      // Total row - localized
-    worksheetData.push([]); // Empty row
-    const totalRow = [''];
-    for (let i = 1; i < headerRow.length - 2; i++) {
-        totalRow.push('');
-    }
-    const grandTotalText = t('grandTotal').toUpperCase();
-    totalRow.push(grandTotalText);
-    totalRow.push(totalWeeklyRevenue.toFixed(2));
-    worksheetData.push(totalRow);
-      // Create worksheet
-    const ws = XLSX.utils.aoa_to_sheet(worksheetData);
-    
-    // Calculate optimal column widths based on content
-    const colWidths = calculateOptimalColumnWidths(worksheetData);
-    ws['!cols'] = colWidths;
-      // Set enhanced row heights for better visual presentation
-    const rowHeights = [];
-    rowHeights[0] = { hpt: 30 }; // Title row - taller for prominence
-    rowHeights[2] = { hpt: 28 }; // Header row - taller for better readability
-    for (let i = 3; i < worksheetData.length - 2; i++) {
-        rowHeights[i] = { hpt: 22 }; // Data rows - comfortable height
-    }
-    rowHeights[worksheetData.length - 1] = { hpt: 28 }; // Total row - emphasized height
-    ws['!rows'] = rowHeights;
-    
-    // Merge cells for title
-    ws['!merges'] = [
-        { s: { r: 0, c: 0 }, e: { r: 0, c: headerRow.length - 1 } }
-    ];
-      // Add professional styling with enhanced visual appearance
-    const titleCell = XLSX.utils.encode_cell({ r: 0, c: 0 });
-    if (!ws[titleCell]) ws[titleCell] = { t: 's', v: '' };
-    ws[titleCell].s = {
-        font: { bold: true, sz: 16, name: 'Calibri', color: { rgb: '1F4E79' } },
-        alignment: { horizontal: 'center', vertical: 'center' },
-        fill: { fgColor: { rgb: 'DCE6F1' } },
-        border: {
-            top: { style: 'medium', color: { rgb: '1F4E79' } },
-            bottom: { style: 'medium', color: { rgb: '1F4E79' } },
-            left: { style: 'medium', color: { rgb: '1F4E79' } },
-            right: { style: 'medium', color: { rgb: '1F4E79' } }
-        }
-    };
-    
-    // Style header row with gradient-like professional appearance
-    for (let c = 0; c < headerRow.length; c++) {
-        const headerCell = XLSX.utils.encode_cell({ r: 2, c });
-        if (!ws[headerCell]) continue;
-        
-        // Different header styling for different column types
-        let headerColor = '4472C4'; // Default blue
-        if (c === 0) headerColor = '4472C4'; // Product column - blue
-        else if (c >= headerRow.length - 2) headerColor = '70AD47'; // Total/Revenue columns - green
-        else headerColor = '5B9BD5'; // Daily columns - lighter blue
-        
-        ws[headerCell].s = {
-            font: { bold: true, sz: 11, name: 'Calibri', color: { rgb: 'FFFFFF' } },
-            alignment: { horizontal: 'center', vertical: 'center', wrapText: true },
-            fill: { fgColor: { rgb: headerColor } },
-            border: {
-                top: { style: 'medium', color: { rgb: '2F5597' } },
-                bottom: { style: 'medium', color: { rgb: '2F5597' } },
-                left: { style: 'thin', color: { rgb: '2F5597' } },
-                right: { style: 'thin', color: { rgb: '2F5597' } }
-            }
-        };
-    }
-    
-    // Style data rows with professional alternating colors and better formatting
-    const dataStartRow = 3;
-    const dataEndRow = worksheetData.length - 3; // Exclude empty row and total row
-    
-    for (let r = dataStartRow; r <= dataEndRow; r++) {
-        const isEvenRow = (r - dataStartRow) % 2 === 0;
-        for (let c = 0; c < headerRow.length; c++) {
-            const cellRef = XLSX.utils.encode_cell({ r, c });
-            if (!ws[cellRef]) continue;
-            
-            // Enhanced color scheme for data rows
-            let fillColor = isEvenRow ? 'FFFFFF' : 'F2F2F2';
-            
-            // Special formatting for monetary columns
-            let numFmt = '';
-            if (c >= headerRow.length - 2) {
-                numFmt = c === headerRow.length - 1 ? '#,##0.00€' : '#,##0'; // Revenue column gets euro symbol
-                fillColor = isEvenRow ? 'F7FBF7' : 'E8F5E8'; // Light green tint for financial data
-            }
-            
-            ws[cellRef].s = {
-                font: { 
-                    sz: c === 0 ? 11 : 10, 
-                    name: 'Calibri',
-                    bold: c === 0 ? true : false, // Bold product names
-                    color: { rgb: c === 0 ? '1F4E79' : '000000' }
-                },
-                alignment: { 
-                    horizontal: c === 0 ? 'left' : (c >= headerRow.length - 2 ? 'right' : 'center'),
-                    vertical: 'center',
-                    wrapText: c === 0,
-                    indent: c === 0 ? 1 : 0 // Slight indentation for product names
-                },
-                fill: { fgColor: { rgb: fillColor } },
-                border: {
-                    top: { style: 'thin', color: { rgb: 'BFBFBF' } },
-                    bottom: { style: 'thin', color: { rgb: 'BFBFBF' } },
-                    left: { style: 'thin', color: { rgb: 'BFBFBF' } },
-                    right: { style: 'thin', color: { rgb: 'BFBFBF' } }
-                },
-                numFmt: numFmt
-            };
-        }
-    }
-    
-    // Style total row with enhanced professional appearance
-    const totalRowIndex = worksheetData.length - 1;
-    for (let c = 0; c < headerRow.length; c++) {
-        const totalCell = XLSX.utils.encode_cell({ r: totalRowIndex, c });
-        if (!ws[totalCell]) continue;
-        
-        // Special styling for the total row
-        let cellAlignment = 'center';
-        let cellColor = 'FFC000'; // Gold/orange color for totals
-        let fontColor = '000000';
-        let numFmt = '';
-        
-        if (c === headerRow.length - 2) {
-            // Total quantity column
-            cellAlignment = 'right';
-            cellColor = 'FFE699';
-        } else if (c === headerRow.length - 1) {
-            // Total revenue column
-            cellAlignment = 'right';
-            cellColor = 'FFD966';
-            numFmt = '#,##0.00€';
-            fontColor = '7F6000'; // Darker color for revenue
-        } else if (c < headerRow.length - 2 && c > 0) {
-            // Empty cells in total row
-            cellColor = 'FFF2CC';
-        }
-        
-        ws[totalCell].s = {
-            font: { 
-                bold: true, 
-                sz: 12, 
-                name: 'Calibri',
-                color: { rgb: fontColor }
-            },
-            alignment: { 
-                horizontal: cellAlignment, 
-                vertical: 'center',
-                indent: c === headerRow.length - 2 || c === headerRow.length - 1 ? 1 : 0
-            },
-            fill: { fgColor: { rgb: cellColor } },
-            border: {
-                top: { style: 'double', color: { rgb: '7F6000' } },
-                bottom: { style: 'double', color: { rgb: '7F6000' } },
-                left: { style: 'medium', color: { rgb: '7F6000' } },
-                right: { style: 'medium', color: { rgb: '7F6000' } }
-            },
-            numFmt: numFmt
-        };
-    }
-      // Add worksheet to workbook with localized name
-    const sheetName = t('weeklyReport');
-    XLSX.utils.book_append_sheet(wb, ws, sheetName);
-    
-    return wb;
-}
-
-/**
- * Function to calculate optimal column widths based on content
- */
-function calculateOptimalColumnWidths(worksheetData: any[][]): { wch: number }[] {
-    if (!worksheetData || worksheetData.length === 0) return [];
-    
-    // Initialize column widths array
-    const maxColumns = Math.max(...worksheetData.map(row => row ? row.length : 0));
-    const columnWidths = new Array(maxColumns).fill(0);
-    
-    // Calculate the width needed for each column
-    worksheetData.forEach((row, rowIndex) => {
-        if (!row) return;
-        
-        row.forEach((cell, colIndex) => {
-            if (cell === null || cell === undefined) return;
-            
-            let cellText = String(cell);
-            
-            // Handle multi-line text (split by \n)
-            const lines = cellText.split('\n');
-            const maxLineLength = Math.max(...lines.map(line => line.length));
-              // Apply different multipliers based on row type and content
-            let widthMultiplier = 1.2; // Base multiplier for character width
-            
-            if (rowIndex === 0) {
-                // Title row - allow more space for prominence
-                widthMultiplier = 1.6;
-            } else if (rowIndex === 2) {
-                // Header row - allow extra space for better readability
-                widthMultiplier = 1.4;
-            } else {
-                // Data rows - check content type for smart sizing
-                if (typeof cell === 'number' || /^\d+([.,]\d+)?[€%]?$/.test(cellText)) {
-                    // Numeric data - less space needed
-                    widthMultiplier = 1.0;
-                } else if (cellText.includes('\n')) {
-                    // Multi-line text - increase width slightly
-                    widthMultiplier = 1.3;
-                }
-            }
-            
-            // Calculate estimated width with smart content analysis
-            let estimatedWidth = maxLineLength * widthMultiplier;
-            
-            // Smart minimum widths based on content type
-            let minWidth = 8;
-            if (rowIndex === 2) { // Header row
-                minWidth = 12; // Headers need more minimum space
-            } else if (cellText.includes('€') || cellText.includes('EUR')) {
-                minWidth = 10; // Currency needs adequate space
-            } else if (cellText.match(/^\d{4}-\d{2}-\d{2}/)) {
-                minWidth = 12; // Dates need consistent width
-            }
-            
-            // Apply constraints with content-aware maximum
-            estimatedWidth = Math.max(estimatedWidth, minWidth);
-            
-            // Dynamic maximum based on content type
-            let maxWidth = 50;
-            if (colIndex === 0) {
-                maxWidth = 35; // Product names don't need excessive width
-            } else if (cellText.match(/^\d+([.,]\d+)?[€%]?$/)) {
-                maxWidth = 15; // Numbers don't need much width
-            }
-            
-            estimatedWidth = Math.min(estimatedWidth, maxWidth);
-            
-            // Update column width if this cell needs more space
-            if (estimatedWidth > columnWidths[colIndex]) {
-                columnWidths[colIndex] = estimatedWidth;
-            }
-        });
-    });
-    
-    // Convert to XLSX format
-    return columnWidths.map(width => ({ wch: Math.ceil(width) }));
-}
-
-/**
- * Function to create a generic workbook from tabular data
- */
-function createGenericWorkbook(data: any[], title: string): XLSX.WorkBook {
-    if (!data || data.length === 0) {
-        // Create empty workbook with just a title
-        const wb = XLSX.utils.book_new();
-        const ws = XLSX.utils.aoa_to_sheet([[title], [t('noDataAvailable')]]);
-        ws['!cols'] = [{ wch: 30 }];
-        XLSX.utils.book_append_sheet(wb, ws, title);
-        return wb;
-    }
-
-    const wb = XLSX.utils.book_new();
-    
-    // Create worksheet data with proper formatting
-    const worksheetData: any[][] = [];
-    
-    // Title row
-    worksheetData.push([title.toUpperCase()]);
-    worksheetData.push([]); // Empty row
-    
-    // Header row - get keys from first object
-    const headers = Object.keys(data[0]);
-    worksheetData.push(headers);
-    
-    // Data rows
-    data.forEach((item: any) => {
-        const row = headers.map(header => {
-            const value = item[header];
-            if (value === null || value === undefined) return '';
-            if (typeof value === 'object') return JSON.stringify(value);
-            return String(value);
-        });
-        worksheetData.push(row);
-    });
-    
-    // Create worksheet
-    const ws = XLSX.utils.aoa_to_sheet(worksheetData);
-    
-    // Calculate optimal column widths based on content
-    const colWidths = calculateOptimalColumnWidths(worksheetData);
-    ws['!cols'] = colWidths;
-      // Set enhanced row heights for professional appearance
-    const rowHeights = [];
-    rowHeights[0] = { hpt: 30 }; // Title row - prominent height
-    rowHeights[2] = { hpt: 25 }; // Header row - comfortable height
-    for (let i = 3; i < worksheetData.length; i++) {
-        rowHeights[i] = { hpt: 20 }; // Data rows - neat and compact
-    }
-    ws['!rows'] = rowHeights;
-    
-    // Merge cells for title
-    ws['!merges'] = [
-        { s: { r: 0, c: 0 }, e: { r: 0, c: headers.length - 1 } }
-    ];
-      // Add enhanced professional styling
-    // Title cell with premium appearance
-    const titleCell = XLSX.utils.encode_cell({ r: 0, c: 0 });
-    if (!ws[titleCell]) ws[titleCell] = { t: 's', v: '' };
-    ws[titleCell].s = {
-        font: { bold: true, sz: 16, name: 'Calibri', color: { rgb: '1F4E79' } },
-        alignment: { horizontal: 'center', vertical: 'center' },
-        fill: { fgColor: { rgb: 'DCE6F1' } },
-        border: {
-            top: { style: 'medium', color: { rgb: '1F4E79' } },
-            bottom: { style: 'medium', color: { rgb: '1F4E79' } },
-            left: { style: 'medium', color: { rgb: '1F4E79' } },
-            right: { style: 'medium', color: { rgb: '1F4E79' } }
-        }
-    };
-    
-    // Style header row with professional gradient
-    for (let c = 0; c < headers.length; c++) {
-        const headerCell = XLSX.utils.encode_cell({ r: 2, c });
-        if (!ws[headerCell]) continue;
-        
-        // Determine header color based on content type
-        let headerColor = '4472C4'; // Default professional blue
-        const headerText = headers[c].toLowerCase();
-        
-        if (headerText.includes('revenue') || headerText.includes('price') || headerText.includes('total')) {
-            headerColor = '70AD47'; // Green for financial data
-        } else if (headerText.includes('date') || headerText.includes('time')) {
-            headerColor = 'C55A11'; // Orange for dates
-        } else if (headerText.includes('quantity') || headerText.includes('qty')) {
-            headerColor = '7030A0'; // Purple for quantities
-        }
-        
-        ws[headerCell].s = {
-            font: { bold: true, sz: 11, name: 'Calibri', color: { rgb: 'FFFFFF' } },
-            alignment: { horizontal: 'center', vertical: 'center', wrapText: true },
-            fill: { fgColor: { rgb: headerColor } },
-            border: {
-                top: { style: 'medium', color: { rgb: '2F5597' } },
-                bottom: { style: 'medium', color: { rgb: '2F5597' } },
-                left: { style: 'thin', color: { rgb: '2F5597' } },
-                right: { style: 'thin', color: { rgb: '2F5597' } }
-            }
-        };
-    }
-    
-    // Style data rows with professional alternating colors and smart formatting
-    for (let r = 3; r < worksheetData.length; r++) {
-        const isEvenRow = (r - 3) % 2 === 0;
-        for (let c = 0; c < headers.length; c++) {
-            const cellRef = XLSX.utils.encode_cell({ r, c });
-            if (!ws[cellRef]) continue;
-            
-            const headerText = headers[c].toLowerCase();
-            let fillColor = isEvenRow ? 'FFFFFF' : 'F2F2F2';
-            let numFmt = '';
-            let fontColor = '000000';
-            let alignment = 'left';
-            
-            // Smart formatting based on column content
-            if (headerText.includes('revenue') || headerText.includes('price')) {
-                numFmt = '#,##0.00€';
-                fillColor = isEvenRow ? 'F7FBF7' : 'E8F5E8'; // Light green for money
-                alignment = 'right';
-                fontColor = '0F5132';
-            } else if (headerText.includes('quantity') || headerText.includes('qty')) {
-                numFmt = '#,##0';
-                alignment = 'center';
-                fillColor = isEvenRow ? 'FFF8E7' : 'FFF0D1'; // Light yellow for quantities
-            } else if (headerText.includes('date')) {
-                numFmt = 'dd/mm/yyyy';
-                alignment = 'center';
-                fillColor = isEvenRow ? 'F0F8FF' : 'E6F3FF'; // Light blue for dates
-            } else if (headerText.includes('id')) {
-                alignment = 'center';
-                fontColor = '6C757D';
-            }
-            
-            ws[cellRef].s = {
-                font: { 
-                    sz: 10, 
-                    name: 'Calibri',
-                    color: { rgb: fontColor }
-                },
-                alignment: { 
-                    horizontal: alignment, 
-                    vertical: 'center',
-                    indent: alignment === 'left' ? 1 : 0
-                },
-                fill: { fgColor: { rgb: fillColor } },
-                border: {
-                    top: { style: 'thin', color: { rgb: 'BFBFBF' } },
-                    bottom: { style: 'thin', color: { rgb: 'BFBFBF' } },
-                    left: { style: 'thin', color: { rgb: 'BFBFBF' } },
-                    right: { style: 'thin', color: { rgb: 'BFBFBF' } }
-                },
-                numFmt: numFmt
-            };
-        }
-    }
-    
-    // Add worksheet to workbook
-    XLSX.utils.book_append_sheet(wb, ws, title);
-    
-    return wb;
-}
-
 const Export: React.FC = () => {
     const { i18n } = useTranslation();
     
     // State for weekly report
+    const [selectedWeekDate, setSelectedWeekDate] = useState<string>(dayjs().format('YYYY-MM-DD'));
     const [weekStartDate, setWeekStartDate] = useState<string>(dayjs().startOf('isoWeek').format('YYYY-MM-DD'));
     const [weeklyReportData, setWeeklyReportData] = useState<any>(null);
     const [isLoadingWeeklyReport, setIsLoadingWeeklyReport] = useState<boolean>(false);
@@ -604,8 +122,11 @@ const Export: React.FC = () => {
     const loadWeeklySalesReport = async () => {
         setIsLoadingWeeklyReport(true);
         setExportStatus(null);
+        // Toujours calculer la semaine complète à partir de la date choisie
+        const monday = dayjs(selectedWeekDate).startOf('isoWeek').format('YYYY-MM-DD');
+        setWeekStartDate(monday); // pour cohérence interne
         try {
-            const data = await window.ipcRenderer.invoke('getWeeklySalesReport', weekStartDate);
+            const data = await window.ipcRenderer.invoke('getWeeklySalesReport', monday);
             setWeeklyReportData(data);
         } catch (error) {
             console.error("Error fetching weekly report:", error);
@@ -688,10 +209,12 @@ const Export: React.FC = () => {
                     break;
                     
                 case 'json':
+                    const weekMondayJson = dayjs(selectedWeekDate).startOf('isoWeek');
+                    const weekSundayJson = dayjs(selectedWeekDate).endOf('isoWeek');
                     exportData = JSON.stringify({
                         reportDate: formattedDate,
-                        weekStartDate: weeklyReportData.startDate,
-                        weekEndDate: weeklyReportData.endDate,
+                        weekStartDate: weekMondayJson.format('YYYY-MM-DD'),
+                        weekEndDate: weekSundayJson.format('YYYY-MM-DD'),
                         weeklyTotal: weeklyReportData.weeklyTotal,
                         products: weeklyReportData.products
                     }, null, 2);
@@ -700,55 +223,49 @@ const Export: React.FC = () => {
                     break;
                     
                 case 'pdf':
-                    // Generate filename for PDF
-                    const pdfFilename = `${t('fileNames.weeklyReport')}-${formattedDate}.pdf`;
+                  if (currentTab !== 0) {
+                    setExportStatus({ success: false, message: t("pdfExportOnlyWeeklyReport") });
+                    return;
+                  }
+                  // Calcul des bornes de la semaine pour le nom du fichier
+                  const weekMondayPdf = dayjs(selectedWeekDate).startOf('isoWeek');
+                  const weekSundayPdf = dayjs(selectedWeekDate).endOf('isoWeek');
+                  const pdfFilename = `${t('fileNames.weeklyReport')}-${weekMondayPdf.format('YYYY-MM-DD')}_to_${weekSundayPdf.format('YYYY-MM-DD')}.pdf`;
+                  
+                  // Use IPC to show save dialog and export PDF
+                  try {
+                    const result = await window.ipcRenderer.invoke('showSaveDialog', {
+                        title: t('saveAs'),
+                        defaultPath: pdfFilename,
+                        filters: [
+                            { name: 'PDF', extensions: ['pdf'] }
+                        ]
+                    });
                     
-                    // Use IPC to show save dialog and export PDF
-                    try {
-                        const result = await window.ipcRenderer.invoke('showSaveDialog', {
-                            title: t('saveAs'),
-                            defaultPath: pdfFilename,
-                            filters: [
-                                { name: 'PDF', extensions: ['pdf'] }
-                            ]
-                        });
-                        
-                        if (!result.canceled && result.filePath) {
-                            await window.ipcRenderer.invoke('exportWeeklyReportPDF', weekStartDate, result.filePath);
-                            setExportStatus({ success: true, message: t("exportSuccess") });
-                        }
-                    } catch (error) {
-                        console.error('PDF export error:', error);
-                        setExportStatus({ success: false, message: `PDF export failed: ${error}` });
+                    if (!result.canceled && result.filePath) {
+                        await window.ipcRenderer.invoke('exportWeeklyReportPDF', weekMondayPdf.format('YYYY-MM-DD'), result.filePath);
+                        setExportStatus({ success: true, message: t("exportSuccess") });
                     }
-                    return; // Exit early for PDF export
-                    
-                case 'xlsx':
-                    const workbookXlsx = createWeeklyReportWorkbook(weeklyReportData, locale);
-                    exportData = XLSX.write(workbookXlsx, { bookType: 'xlsx', type: 'array' });
-                    mimeType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
-                    fileExtension = 'xlsx';
-                    break;
-                    
-                case 'ods':
-                    const workbookOds = createWeeklyReportWorkbook(weeklyReportData, locale);
-                    exportData = XLSX.write(workbookOds, { bookType: 'ods', type: 'array' });
-                    mimeType = 'application/vnd.oasis.opendocument.spreadsheet';
-                    fileExtension = 'ods';
-                    break;
+                  } catch (error) {
+                    console.error('PDF export error:', error);
+                    setExportStatus({ success: false, message: `PDF export failed: ${error}` });
+                  }
+                  return; // Exit early for PDF export
                     
                 default:
                     setExportStatus({ success: false, message: t("formatNotSupported") });
                     return;
             }
-              // Generate filename with date
-            const filename = `${t('fileNames.weeklyReport')}-${formattedDate}.${fileExtension}`;
+              // Génère le nom du fichier pour CSV/JSON avec lundi et dimanche
+            const weekMondayStr = dayjs(selectedWeekDate).startOf('isoWeek').format('YYYY-MM-DD');
+            const weekSundayStr = dayjs(selectedWeekDate).endOf('isoWeek').format('YYYY-MM-DD');
+            const filename = `${t('fileNames.weeklyReport')}-${weekMondayStr}_to_${weekSundayStr}.${fileExtension}`;
             
             // Download file based on format
-            if (exportFormat === 'xlsx' || exportFormat === 'ods') {
-                downloadBinaryFile(exportData as ArrayBuffer, filename, mimeType);
-            } else {
+            if (exportFormat === 'csv' || exportFormat === 'json') {
                 downloadFile(exportData as string, filename, mimeType);
+            } else {
+                setExportStatus({ success: false, message: t("formatNotSupported") });
             }
             
             setExportStatus({ success: true, message: t("exportSuccess") });
@@ -819,18 +336,6 @@ const Export: React.FC = () => {
                         setExportStatus({ success: false, message: `PDF export failed: ${error}` });
                     }
                     return; // Exit early for PDF export
-                case 'xlsx':
-                    const workbookXlsx = createGenericWorkbook(salesSummaryData, t('salesSummary'));
-                    exportData = XLSX.write(workbookXlsx, { bookType: 'xlsx', type: 'array' });
-                    mimeType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
-                    fileExtension = 'xlsx';
-                    break;
-                case 'ods':
-                    const workbookOds = createGenericWorkbook(salesSummaryData, t('salesSummary'));
-                    exportData = XLSX.write(workbookOds, { bookType: 'ods', type: 'array' });
-                    mimeType = 'application/vnd.oasis.opendocument.spreadsheet';
-                    fileExtension = 'ods';
-                    break;
                 default:
                     setExportStatus({ success: false, message: t("formatNotSupported") });
                     return;
@@ -838,10 +343,10 @@ const Export: React.FC = () => {
             const filename = `${t('fileNames.salesSummary')}-${fromDate}-to-${toDate}.${fileExtension}`;
             
             // Download file based on format
-            if (exportFormat === 'xlsx' || exportFormat === 'ods') {
-                downloadBinaryFile(exportData as ArrayBuffer, filename, mimeType);
-            } else {
+            if (exportFormat === 'csv' || exportFormat === 'json') {
                 downloadFile(exportData as string, filename, mimeType);
+            } else {
+                setExportStatus({ success: false, message: t("formatNotSupported") });
             }
             
             setExportStatus({ success: true, message: t("exportSuccess") });
@@ -876,17 +381,6 @@ const Export: React.FC = () => {
                     exportData = JSON.stringify(orders, null, 2);
                     mimeType = 'application/json';
                     fileExtension = 'json';
-                    break;                case 'xlsx':
-                    const workbookXlsx = createGenericWorkbook(orders, t('allOrders'));
-                    exportData = XLSX.write(workbookXlsx, { bookType: 'xlsx', type: 'array' });
-                    mimeType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
-                    fileExtension = 'xlsx';
-                    break;
-                case 'ods':
-                    const workbookOds = createGenericWorkbook(orders, t('allOrders'));
-                    exportData = XLSX.write(workbookOds, { bookType: 'ods', type: 'array' });
-                    mimeType = 'application/vnd.oasis.opendocument.spreadsheet';
-                    fileExtension = 'ods';
                     break;
                 default:
                     setExportStatus({ success: false, message: t("formatNotSupported") });
@@ -896,10 +390,10 @@ const Export: React.FC = () => {
             const filename = `${t('fileNames.allOrders')}-${currentDate}.${fileExtension}`;
             
             // Download file based on format
-            if (exportFormat === 'xlsx' || exportFormat === 'ods') {
-                downloadBinaryFile(exportData as ArrayBuffer, filename, mimeType);
-            } else {
+            if (exportFormat === 'csv' || exportFormat === 'json') {
                 downloadFile(exportData as string, filename, mimeType);
+            } else {
+                setExportStatus({ success: false, message: t("formatNotSupported") });
             }
             
             setExportStatus({ success: true, message: t("exportSuccess") });
@@ -934,17 +428,6 @@ const Export: React.FC = () => {
                     exportData = JSON.stringify(products, null, 2);
                     mimeType = 'application/json';
                     fileExtension = 'json';
-                    break;                case 'xlsx':
-                    const workbookXlsx = createGenericWorkbook(products, t('productCatalog'));
-                    exportData = XLSX.write(workbookXlsx, { bookType: 'xlsx', type: 'array' });
-                    mimeType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
-                    fileExtension = 'xlsx';
-                    break;
-                case 'ods':
-                    const workbookOds = createGenericWorkbook(products, t('productCatalog'));
-                    exportData = XLSX.write(workbookOds, { bookType: 'ods', type: 'array' });
-                    mimeType = 'application/vnd.oasis.opendocument.spreadsheet';
-                    fileExtension = 'ods';
                     break;
                 default:
                     setExportStatus({ success: false, message: t("formatNotSupported") });
@@ -954,10 +437,10 @@ const Export: React.FC = () => {
             const filename = `${t('fileNames.productCatalog')}-${currentDate}.${fileExtension}`;
             
             // Download file based on format
-            if (exportFormat === 'xlsx' || exportFormat === 'ods') {
-                downloadBinaryFile(exportData as ArrayBuffer, filename, mimeType);
-            } else {
+            if (exportFormat === 'csv' || exportFormat === 'json') {
                 downloadFile(exportData as string, filename, mimeType);
+            } else {
+                setExportStatus({ success: false, message: t("formatNotSupported") });
             }
             
             setExportStatus({ success: true, message: t("exportSuccess") });
@@ -965,6 +448,13 @@ const Export: React.FC = () => {
             console.error("Error exporting products:", error);
             setExportStatus({ success: false, message: t("exportError") });
         }
+    };
+
+    // Met à jour la date sélectionnée et la semaine correspondante
+    const handleWeekDateChange = (dateStr: string) => {
+        setSelectedWeekDate(dateStr);
+        const monday = dayjs(dateStr).startOf('isoWeek').format('YYYY-MM-DD');
+        setWeekStartDate(monday);
     };
 
     return (
@@ -1074,7 +564,8 @@ const Export: React.FC = () => {
                         >
                             JSON
                         </button>
-                        <button 
+                        {currentTab === 0 && (
+                          <button 
                             className={`px-3 py-1 rounded-md text-sm transition-all ${
                                 exportFormat === "pdf" 
                                 ? "bg-blue-500 text-white dark:bg-blue-700" 
@@ -1082,28 +573,9 @@ const Export: React.FC = () => {
                             }`}
                             onClick={() => setExportFormat("pdf")}
                         >
-                            📄 PDF
+                            PDF
                         </button>
-                        <button 
-                            className={`px-3 py-1 rounded-md text-sm transition-all ${
-                                exportFormat === "xlsx" 
-                                ? "bg-blue-500 text-white dark:bg-blue-700" 
-                                : "bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-white"
-                            }`}
-                            onClick={() => setExportFormat("xlsx")}
-                        >
-                            XLSX (Excel)
-                        </button>
-                        <button 
-                            className={`px-3 py-1 rounded-md text-sm transition-all ${
-                                exportFormat === "ods" 
-                                ? "bg-blue-500 text-white dark:bg-blue-700" 
-                                : "bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-white"
-                            }`}
-                            onClick={() => setExportFormat("ods")}
-                        >
-                            ODS (LibreOffice)
-                        </button>
+                        )}
                     </div>
                 </div>
                 
@@ -1122,8 +594,8 @@ const Export: React.FC = () => {
                                     </label>
                                     <input
                                         type="date"
-                                        value={weekStartDate}
-                                        onChange={(e) => setWeekStartDate(e.target.value)}
+                                        value={selectedWeekDate}
+                                        onChange={(e) => handleWeekDateChange(e.target.value)}
                                         className="w-full p-2.5 text-sm bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-blue-500 focus:border-blue-500 transition-all"
                                     />
                                 </div>
