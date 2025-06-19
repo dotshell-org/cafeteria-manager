@@ -699,6 +699,30 @@ const Export: React.FC = () => {
                     fileExtension = 'json';
                     break;
                     
+                case 'pdf':
+                    // Generate filename for PDF
+                    const pdfFilename = `${t('fileNames.weeklyReport')}-${formattedDate}.pdf`;
+                    
+                    // Use IPC to show save dialog and export PDF
+                    try {
+                        const result = await window.ipcRenderer.invoke('showSaveDialog', {
+                            title: t('saveAs'),
+                            defaultPath: pdfFilename,
+                            filters: [
+                                { name: 'PDF', extensions: ['pdf'] }
+                            ]
+                        });
+                        
+                        if (!result.canceled && result.filePath) {
+                            await window.ipcRenderer.invoke('exportWeeklyReportPDF', weekStartDate, result.filePath);
+                            setExportStatus({ success: true, message: t("exportSuccess") });
+                        }
+                    } catch (error) {
+                        console.error('PDF export error:', error);
+                        setExportStatus({ success: false, message: `PDF export failed: ${error}` });
+                    }
+                    return; // Exit early for PDF export
+                    
                 case 'xlsx':
                     const workbookXlsx = createWeeklyReportWorkbook(weeklyReportData, locale);
                     exportData = XLSX.write(workbookXlsx, { bookType: 'xlsx', type: 'array' });
@@ -771,7 +795,31 @@ const Export: React.FC = () => {
                     }, null, 2);
                     mimeType = 'application/json';
                     fileExtension = 'json'; 
-                    break;                case 'xlsx':
+                    break;
+                case 'pdf':
+                    // Generate filename for PDF
+                    const pdfFilename = `${t('fileNames.salesSummary')}-${fromDate}-to-${toDate}.pdf`;
+                    
+                    // Use IPC to show save dialog and export PDF
+                    try {
+                        const result = await window.ipcRenderer.invoke('showSaveDialog', {
+                            title: t('saveAs'),
+                            defaultPath: pdfFilename,
+                            filters: [
+                                { name: 'PDF', extensions: ['pdf'] }
+                            ]
+                        });
+                        
+                        if (!result.canceled && result.filePath) {
+                            await window.ipcRenderer.invoke('exportSalesSummaryPDF', startDate, endDate, result.filePath);
+                            setExportStatus({ success: true, message: t("exportSuccess") });
+                        }
+                    } catch (error) {
+                        console.error('PDF export error:', error);
+                        setExportStatus({ success: false, message: `PDF export failed: ${error}` });
+                    }
+                    return; // Exit early for PDF export
+                case 'xlsx':
                     const workbookXlsx = createGenericWorkbook(salesSummaryData, t('salesSummary'));
                     exportData = XLSX.write(workbookXlsx, { bookType: 'xlsx', type: 'array' });
                     mimeType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
@@ -1025,6 +1073,16 @@ const Export: React.FC = () => {
                             onClick={() => setExportFormat("json")}
                         >
                             JSON
+                        </button>
+                        <button 
+                            className={`px-3 py-1 rounded-md text-sm transition-all ${
+                                exportFormat === "pdf" 
+                                ? "bg-blue-500 text-white dark:bg-blue-700" 
+                                : "bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-white"
+                            }`}
+                            onClick={() => setExportFormat("pdf")}
+                        >
+                            📄 PDF
                         </button>
                         <button 
                             className={`px-3 py-1 rounded-md text-sm transition-all ${

@@ -27,6 +27,7 @@
     "@mui/x-charts": "^8.5.0",
     "axios": "^1.8.4",
     "better-sqlite3": "^11.8.1",
+    "bufferutil": "^4.0.9",
     "dayjs": "^1.11.13",
     "framer-motion": "^11.17.0",
     "i18next": "^25.2.1",
@@ -41,6 +42,7 @@
     "react-router-dom": "^7.1.1",
     "recharts": "^2.15.1",
     "tesseract.js": "^6.0.0",
+    "utf-8-validate": "^6.0.5",
     "xlsx": "^0.18.5"
   },
   "devDependencies": {

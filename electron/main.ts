@@ -1,4 +1,4 @@
-import {app, BrowserWindow, ipcMain, protocol} from 'electron';
+import {app, BrowserWindow, ipcMain, protocol, dialog} from 'electron';
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
 import fs from 'node:fs';
@@ -15,6 +15,7 @@ import {
 import { addProduct, updateProduct, deleteProduct, saveOrder } from '../src/backend/db/setters.js';
 import { getRevenueData, getOrderCountData, getProductSalesData } from '../src/backend/db/getStats.js';
 import { getWeeklySalesReport, getAllOrders, getSalesSummary, getAllProducts } from '../src/backend/export/exportData.js';
+import { exportWeeklyReportPDF, exportSalesSummaryPDF } from '../src/backend/export/pdfExport.js';
 import {Product} from "../src/types/generic/Product.js";
 import {getLanguagePreference, saveLanguagePreference} from "../src/backend/db/settings.js";
 
@@ -143,6 +144,15 @@ handleIpc('getWeeklySalesReport', getWeeklySalesReport);
 handleIpc('getAllOrders', getAllOrders);
 handleIpc('getSalesSummary', getSalesSummary);
 handleIpc('getAllProductsForExport', getAllProducts);
+
+// PDF Export handlers
+handleIpc('exportWeeklyReportPDF', exportWeeklyReportPDF);
+handleIpc('exportSalesSummaryPDF', exportSalesSummaryPDF);
+
+// Dialog handlers
+handleIpc('showSaveDialog', async (options: any) => {
+    return await dialog.showSaveDialog(win!, options);
+});
 
 // Settings
 handleIpc("saveLanguagePreference", saveLanguagePreference);
