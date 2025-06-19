@@ -243,7 +243,7 @@ const Export: React.FC = () => {
                     });
                     
                     if (!result.canceled && result.filePath) {
-                        await window.ipcRenderer.invoke('exportWeeklyReportPDF', weekMondayPdf.format('YYYY-MM-DD'), result.filePath);
+                        await window.ipcRenderer.invoke('exportWeeklyReportPDF', weekMondayPdf.format('YYYY-MM-DD'), result.filePath, locale);
                         setExportStatus({ success: true, message: t("exportSuccess") });
                     }
                   } catch (error) {
