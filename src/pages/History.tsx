@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react";
 import {motion} from "framer-motion";
-import {Order} from "../types/generic/Order.ts";
+import {Order} from "../types/generic/Order";
 import {t} from "i18next";
 import { useTranslation } from 'react-i18next';
 

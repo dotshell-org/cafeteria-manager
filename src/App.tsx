@@ -1,16 +1,16 @@
 import {useMemo, useState, useEffect} from 'react';
 import {useMediaQuery, createTheme, ThemeProvider} from '@mui/material';
-import Calendar from "./pages/Calendar.tsx";
-import NavBar from "./components/nav/NavBar.tsx";
-import {Tab} from "./types/nav/Tab.ts";
-import CashRegister from "./pages/CashRegister.tsx";
+import Calendar from "./pages/Calendar";
+import NavBar from "./components/nav/NavBar";
+import {Tab} from "./types/nav/Tab";
+import CashRegister from "./pages/CashRegister";
 import dayjs from "dayjs";
 import {AnimatePresence} from 'framer-motion';
-import EditProducts from "./pages/EditProducts.tsx";
-import History from "./pages/History.tsx";
-import Stats from "./pages/Stats.tsx";
-import Export from "./pages/Export.tsx";
-import Settings from "./pages/Settings.tsx";
+import EditProducts from "./pages/EditProducts";
+import History from "./pages/History";
+import Stats from "./pages/Stats";
+import Export from "./pages/Export";
+import Settings from "./pages/Settings";
 
 function App() {
 

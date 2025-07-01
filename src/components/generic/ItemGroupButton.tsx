@@ -1,5 +1,5 @@
 import React from "react";
-import {ItemGroup} from "../../types/generic/ItemGroup.ts";
+import {ItemGroup} from "../../types/generic/ItemGroup";
 
 interface ItemGroupButtonInterface {
     id: number;

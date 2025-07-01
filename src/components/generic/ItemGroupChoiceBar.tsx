@@ -1,6 +1,6 @@
-import ItemGroupButton from "./ItemGroupButton.tsx";
+import ItemGroupButton from "./ItemGroupButton";
 import React from "react";
-import {ItemGroup} from "../../types/generic/ItemGroup.ts";
+import {ItemGroup} from "../../types/generic/ItemGroup";
 
 interface ItemGroupChoiceBarInterface {
     groups: ItemGroup[];

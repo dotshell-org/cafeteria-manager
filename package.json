@@ -1,8 +1,8 @@
 {
   "name": "cafeteria-manager",
   "private": true,
-  "version": "0.0.0",
-  "description": "A modern cafeteria manager software compatible with Glome.",
+  "version": "25.0.0",
+  "description": "A modern cafeteria manager software compatible with Ico.",
   "author": "Dotshell <tristan.gscn@proton.me>",
   "type": "module",
   "scripts": {

@@ -1,6 +1,6 @@
 import Icon from '/app-icon.svg';
-import NavItem from "./NavItem.tsx";
-import {Tab} from '../../types/nav/Tab.ts'
+import NavItem from "./NavItem";
+import {Tab} from '../../types/nav/Tab'
 import React from "react";
 
 interface NavBarProps {

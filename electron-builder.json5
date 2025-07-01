@@ -47,11 +47,13 @@
     "icon": "public/app-icon-windows-linux.png",
     "category": "Utility",
     "desktop": {
-      "Name": "Cafeteria Manager",
-      "Icon": "cafeteria-manager",
-      "Terminal": false,
-      "Type": "Application",
-      "Categories": "Utility;Office"
+      "entry": {
+        "Name": "Cafeteria Manager",
+        "Icon": "cafeteria-manager",
+        "Terminal": false,
+        "Type": "Application",
+        "Categories": "Utility;Office"
+      }
     },
     "maintainer": "Cafeteria Manager Team <contact@example.com>"
   },

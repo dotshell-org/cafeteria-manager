@@ -1,5 +1,5 @@
 import React from "react";
-import {Item} from "../../types/generic/Item.ts";
+import {Item} from "../../types/generic/Item";
 
 interface ProductCardProps {
     item: Item;

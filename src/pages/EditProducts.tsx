@@ -1,9 +1,9 @@
 import {t} from "i18next";
 import {useRef, useState, useEffect} from "react";
-import {Product} from "../types/generic/Product.ts";
+import {Product} from "../types/generic/Product";
 import { IpcRenderer } from "electron";
 import { motion } from "framer-motion";
-import { ItemGroup } from "../types/generic/ItemGroup.ts";
+import { ItemGroup } from "../types/generic/ItemGroup";
 
 // Define the extended Window interface
 declare global {

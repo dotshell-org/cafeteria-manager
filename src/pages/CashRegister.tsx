@@ -1,13 +1,13 @@
 import React, {useEffect, useState} from "react";
 import {motion} from "framer-motion";
-import SearchBar from "../components/generic/SearchBar.tsx";
-import ItemGroupChoiceBar from "../components/generic/ItemGroupChoiceBar.tsx";
-import {Item} from "../types/generic/Item.ts";
-import {ItemGroup} from "../types/generic/ItemGroup.ts";
-import ProductCard from "../components/cash-register/ProductCard.tsx";
+import SearchBar from "../components/generic/SearchBar";
+import ItemGroupChoiceBar from "../components/generic/ItemGroupChoiceBar";
+import {Item} from "../types/generic/Item";
+import {ItemGroup} from "../types/generic/ItemGroup";
+import ProductCard from "../components/cash-register/ProductCard";
 import { IpcRenderer } from "electron";
 import {t} from "i18next";
-import { Order } from "../types/generic/Order.ts";
+import { Order } from "../types/generic/Order";
 
 // Define the extended Window interface
 declare global {
