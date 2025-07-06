@@ -20,7 +20,7 @@
     "postinstall": "electron-builder install-app-deps"
   },
   "dependencies": {
-    "@chakra-ui/react": "^3.19.1",
+    "@chakra-ui/react": "^3.21.1",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
     "@heroicons/react": "^2.2.0",
