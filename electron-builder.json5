@@ -17,6 +17,7 @@
     "target": [
       "dmg"
     ],
+    "sign": false,
     "artifactName": "${productName}-Mac-${version}-Installer.${ext}",
     "icon": "public/app-icon.png"
   },
