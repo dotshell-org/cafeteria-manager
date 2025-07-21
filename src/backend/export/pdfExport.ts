@@ -10,11 +10,11 @@ import 'dayjs/locale/nl';
 import 'dayjs/locale/ja';
 import 'dayjs/locale/zh';
 import 'dayjs/locale/ar';
+import localizedFormat from 'dayjs/plugin/localizedFormat.js';
 import { getWeeklySalesReport, getSalesSummary } from './exportData.js';
 import path from 'path';
 import fs from 'fs';
 import os from 'os';
-import localizedFormat from 'dayjs/plugin/localizedFormat';
 
 dayjs.extend(localizedFormat);
 
